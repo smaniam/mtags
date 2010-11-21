@@ -34,4 +34,9 @@ extern int m4a_stream_chksum(
 
 extern int m4a_disp_tree();
 
+int m4a_get_atomidx(
+    const char *name, 
+    int inst,
+    int from);
+
 #endif
