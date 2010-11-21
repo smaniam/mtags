@@ -6,7 +6,7 @@
 #include "m4a_json.h"
 #include "mhash.h"
 
-#define TABSPACE "    "
+const char *TABSPACE = "    ";
 
 int m4a_display_json_tree(
     FILE *in,
@@ -19,18 +19,19 @@ int m4a_display_json_tree(
 
     char pfx[512];
     int i, j;
+    int     inst = 0;
 
     fprintf(out, "{\n");
     while ((lnsz = getline(&line, &len, in)) != -1) 
     {
-        size_t span;
-        int curlvl;
-        char *tok;
-        char *ptree[10];
-        char lvlspc[256];
+        size_t  span;
+        int     curlvl;
+        char    *tok;
+        char    *ptree[10];
+        char    lvlspc[256];
+        char    extname[32];
 
         line[lnsz-1] = '\0';
-        //printf("Retrieved line of length %zu :\n", lnsz);
         //printf("%s", line);
 
         tok = strtok(line, " ");
@@ -45,6 +46,21 @@ int m4a_display_json_tree(
             i++;
         }
         //for (j = 0; j < i; j++) printf ("===> %s\n", ptree[j]);
+
+        if (strcmp(ptree[1], "----") == 0)
+        {
+            int idx;
+            inst++;
+            idx = m4a_get_atomidx("----", inst, 0);
+            if ((idx =  m4a_get_atomidx("name", 1, idx)) != -1)
+            {
+                strcpy(extname, "----[");
+                strcat(extname, parsedAtoms[idx].ReverseDNSname);
+                strcat(extname, "]");
+
+                ptree[1] = extname;
+            }
+        }
 
         pfx[0] = '\0';
         span = strspn(line, " ");
@@ -363,4 +379,37 @@ int m4a_disp_tree()
         }
 
     return 0;
+}
+
+int m4a_get_atomidx(const char *name, int inst, int from)
+{
+    int idx    = from;
+    int cnt    = 0;
+    AtomicInfo*  atom;
+
+    
+    if ((atom_number == 0) || (name == NULL) ) return -1;
+    while(1)
+    {
+        atom = &parsedAtoms[idx];
+
+        if (memcmp(atom->AtomicName, name, 4) == 0)
+        {
+            /*
+            fprintf(stdout, 
+                "%i  -  Atom \"%s\" (level %u) has next atom at #%i\n",
+                idx, atom->AtomicName, atom->AtomicLevel, 
+                atom->NextAtomNumber);
+            */
+
+            if (++cnt == inst) return idx;
+        }
+
+        if (parsedAtoms[idx].NextAtomNumber == 0)
+            break;
+        idx = parsedAtoms[idx].NextAtomNumber;
+    }
+
+    // Not Found
+    return -2;
 }
