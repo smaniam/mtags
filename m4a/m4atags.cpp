@@ -332,12 +332,19 @@ main (int argc, char **argv)
     {
         int mda;
         unsigned char  bfr[2][64];
+        int idx;
 
         mda = APar_DetermineMediaData_AtomPosition();
         printf ("Location of mdat: %d\n", mda);
 
         //APar_SimpleAtomPrintout();
         m4a_stream_chksum(m4afile, bfr[0], bfr[1]);
+
+        idx = m4a_get_atomidx((const char *) "----", 1, 0);
+        printf("\n");
+        idx = m4a_get_atomidx("name", 1, idx);
+        printf("%s\n", parsedAtoms[idx].ReverseDNSname);
+        
     }
     exit (0);
 }
