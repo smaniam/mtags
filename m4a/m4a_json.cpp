@@ -253,22 +253,28 @@ int m4a_display_json_tags(
         fst = 1;
     }
 
-    if (md5sum != NULL)
+    if ((md5sum != NULL) || (sha1sum != NULL))
     {
-        const char *tab = TABSPACE;
-        fprintf(
-            out, "\",\n%s\"md5sum\": \"%s",
-            tab, md5sum);
-    }
-    if (sha1sum != NULL)
-    {
-        const char *tab = TABSPACE;
-        fprintf(
-            out, "\",\n%s\"sha1sum\": \"%s",
-            tab, sha1sum);
-    }
+        char pfx[2];
 
-    fprintf(out, "\"\n}\n");
+        pfx[0] = '\0';
+        fprintf( out, "\",\n%s\"stream\": {", TABSPACE); 
+        if (md5sum != NULL)
+        {
+            fprintf(
+                out, " \"md5sum\": \"%s\"", md5sum);
+            pfx[0] = ','; pfx[1] = '\0';
+        }
+
+        if (sha1sum != NULL)
+        {
+            fprintf(
+                out, "%s \"sha1sum\": \"%s\"", pfx, sha1sum);
+        }
+        fprintf( out, " }\n}\n"); 
+    }
+    else
+        fprintf(out, "\"\n}\n");
     if (line != NULL) free(line);
 
     return 0;
@@ -412,4 +418,33 @@ int m4a_get_atomidx(const char *name, int inst, int from)
 
     // Not Found
     return -2;
+}
+
+
+int m4a_extract_art(int atmidx, char *img, int *type)
+{
+    char* art = (char*)malloc( 
+        sizeof(char) * (parsedAtoms[atmidx].AtomicLength-16) +1 );
+
+    memset(art, 0, (parsedAtoms[atmidx].AtomicLength-16) +1);
+
+    fseeko(source_file,parsedAtoms[atmidx].AtomicStart+16, SEEK_SET);
+    fread(art, 1,
+        parsedAtoms[atmidx].AtomicLength-16, source_file);
+        
+        
+    if (memcmp(art, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8) == 0) 
+    {
+        *type = M4A_PNG;
+    }
+    else if (memcmp(art, "\xFF\xD8\xFF\xE0", 4) == 0 || 
+        memcmp(art, "\xFF\xD8\xFF\xE1", 4) == 0) 
+    {
+        *type = M4A_JPG;
+    }
+    else
+        return 1;
+        
+    img = art;
+    return 0;
 }
