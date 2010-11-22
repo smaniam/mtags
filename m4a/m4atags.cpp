@@ -68,8 +68,7 @@ void ExtractPaddingPrefs(char* env_padding_prefs) {
 }
 
 
-void GetBasePath(const char *filepath, char* &basepath) {
-    //with a myriad of m4a, m4p, mp4, whatever else comes up... it might just be easiest to strip off the end.
+void strip_extn(const char *filepath, char* &basepath) {
     int split_here = 0;
     for (int i=strlen(filepath); i >= 0; i--) {
         const char* this_char=&filepath[i];
@@ -92,14 +91,15 @@ void GetBasePath(const char *filepath, char* &basepath) {
 
 typedef struct 
 {
-    int mode;
-    int md5sum;
-    int sha1sum;
-    char pixpath[128];
-    int hckout[2];
-    int stdout_sav;
-    int stdout_new;
-    FILE *str;
+    int            mode;
+    int            md5sum;
+    int            sha1sum;
+    unsigned char  bfr[2][64];
+    char           pixpath[128];
+    int            hckout[2];
+    int            stdout_sav;
+    int            stdout_new;
+    FILE           *str;
 } M4A_TAG_CFG;
 
 
@@ -149,6 +149,38 @@ inline void cleanup_io(M4A_TAG_CFG *cfg)
     close(cfg->hckout[0]);
 }
 
+
+inline int get_chksum(M4A_TAG_CFG *cfg, char *m4afile,
+    unsigned char **md5sum, unsigned char **sha1sum)
+{
+    int getcksum = M4A_FALSE;
+
+    *md5sum  = NULL;
+    *sha1sum = NULL;
+
+    if (cfg->md5sum == M4A_TRUE) 
+    {
+        *md5sum   = cfg->bfr[0];
+        getcksum = M4A_TRUE;
+    }
+
+    if (cfg->sha1sum == M4A_TRUE)
+    {
+        *sha1sum  = cfg->bfr[1];
+        getcksum = M4A_TRUE;
+    }
+
+    if (getcksum == M4A_TRUE)
+    {
+         if (m4a_stream_chksum(m4afile, *md5sum, *sha1sum) != 0)
+         {
+             fprintf(stderr, "Checksum failure exiting\n");
+             return 10;
+         }
+         return 0;
+    }
+    return 1;
+}
 /*
 ********************************************************************************
 **
@@ -190,7 +222,7 @@ main (int argc, char **argv)
         int option_index = 0;
 
         c = getopt_long (argc, argv, "p:o:lvhtmsc",
-                       long_options, &option_index);
+               long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -271,7 +303,7 @@ main (int argc, char **argv)
     }
 
     TestFileExistence(m4afile, true);
-	xmlInitEndianDetection();
+    xmlInitEndianDetection();
     
     ExtractPaddingPrefs(NULL);
     
@@ -280,32 +312,12 @@ main (int argc, char **argv)
     
     if (cfg.mode == M4A_MODE_LITERAL)
     {
-        int getcksum = M4A_FALSE;
-        unsigned char  bfr[2][64];
-        unsigned char  *md5sum  = NULL;
-        unsigned char  *sha1sum = NULL;
+        unsigned char *md5sum   =  NULL;
+        unsigned char *sha1sum  =  NULL;
+
 
         openSomeFile(m4afile, true);
-        if (cfg.md5sum == M4A_TRUE) 
-        {
-            md5sum   = bfr[0];
-            getcksum = M4A_TRUE;
-        }
-
-        if (cfg.sha1sum == M4A_TRUE)
-        {
-            sha1sum  = bfr[1];
-            getcksum = M4A_TRUE;
-        }
-
-        if (getcksum == M4A_TRUE)
-        {
-             if (m4a_stream_chksum(m4afile, md5sum, sha1sum) != 0)
-             {
-                 fprintf(stderr, "Checksum failure exiting\n");
-                 return 10;
-             }
-        }
+        get_chksum(&cfg, m4afile, &md5sum, &sha1sum);
 
         redirect_io(&cfg);
         if (metadata_style >= THIRD_GEN_PARTNER) 
@@ -333,6 +345,10 @@ main (int argc, char **argv)
         int mda;
         unsigned char  bfr[2][64];
         int idx;
+        int type = 0;
+        char *img = NULL;
+        int cvr;
+        int ret;
 
         mda = APar_DetermineMediaData_AtomPosition();
         printf ("Location of mdat: %d\n", mda);
@@ -340,11 +356,45 @@ main (int argc, char **argv)
         //APar_SimpleAtomPrintout();
         m4a_stream_chksum(m4afile, bfr[0], bfr[1]);
 
-        idx = m4a_get_atomidx((const char *) "----", 1, 0);
+        cvr = m4a_get_atomidx((const char *) "covr", 1, 0);
         printf("\n");
-        idx = m4a_get_atomidx("name", 1, idx);
-        printf("%s\n", parsedAtoms[idx].ReverseDNSname);
+        openSomeFile(m4afile, true);
+        idx = parsedAtoms[cvr].NextAtomNumber;
+        while (parsedAtoms[idx].AtomicLevel > parsedAtoms[cvr].AtomicLevel)
+        {
+            ret = m4a_extract_art(idx, img, &type);
+            if (ret == 0) break;
+            idx = parsedAtoms[idx].NextAtomNumber;
+        }
+        openSomeFile(m4afile, false);
+        printf("%d\n", type);
         
+    }
+    else
+    {
+        unsigned char *md5sum = NULL, *sha1sum = NULL;
+
+        if (get_chksum(&cfg, m4afile, &md5sum, &sha1sum) == 0)
+        {
+            if ((md5sum != NULL) || (sha1sum != NULL))
+            {
+                char pfx[2];
+
+                pfx[0] = '\0';
+                printf("{\n    \"stream\": {"); 
+                if (md5sum != NULL)
+                {
+                    printf(" \"md5sum\": \"%s\"", md5sum);
+                    pfx[0] = ','; pfx[1] = '\0';
+                }
+
+                if (sha1sum != NULL)
+                {
+                    printf("%s \"sha1sum\": \"%s\"", pfx, sha1sum);
+                }
+                printf(" }\n}\n"); 
+            }
+        }
     }
     exit (0);
 }
