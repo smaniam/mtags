@@ -16,6 +16,9 @@
 
 #define M4A_CHKSUM_BFR_SZ   128
 
+#define M4A_PNG             1
+#define M4A_JPG             2
+
 extern int m4a_display_json_tree(
     FILE *in,
     FILE *out);
@@ -34,9 +37,11 @@ extern int m4a_stream_chksum(
 
 extern int m4a_disp_tree();
 
-int m4a_get_atomidx(
+extern int m4a_get_atomidx(
     const char *name, 
     int inst,
     int from);
+
+extern int m4a_extract_art(int atmidx, char *img, int *type);
 
 #endif
