@@ -5,6 +5,10 @@
 #include "apar_glob.h"
 #include "m4a_json.h"
 #include "mhash.h"
+extern "C"
+{
+#include "b64/cencode.h"
+}
 
 const char *TABSPACE = "    ";
 
@@ -168,14 +172,17 @@ int m4a_display_json_tags(
     FILE *out,
     unsigned char *md5sum,
     unsigned char *sha1sum,
-    char          *covr)
+    M4A_ART       *art,
+    int           cnt,
+    char          *path)
 {
     char     *line = NULL;
     size_t   len = 0;
     ssize_t  lnsz;
     int      fst = 0;
 
-    
+    int      nonstr = M4A_FALSE;
+
     fprintf(out, "\{\n");
     while ((lnsz = getline(&line, &len, in)) != -1) 
     {
@@ -184,12 +191,10 @@ int m4a_display_json_tags(
         char pfx[512];
         int i, j;
         char atom[128];
-        char value[128];
+        char value[256];
         char sanitised[256];
 
         line[lnsz-1] = '\0';
-        //printf("Retrieved line of length %zu :\n", lnsz);
-        //printf("%s", line);
 
         tok = strtok(line, " ");
 
@@ -209,7 +214,6 @@ int m4a_display_json_tags(
         i = 0;
         while (tok != NULL)
         {
-            //printf("===> %s\n", tok);
             ptree[i] = tok;
             tok = strtok(NULL, " ");
             i++;
@@ -228,13 +232,14 @@ int m4a_display_json_tags(
         }
         strcat(atom, "\"");
 
-        // For Covr it is enough to display value as "true"
+        // Aggregate non-covr tags
         if (strcmp(atom, "\"covr\"") != 0)
         {
             j++;
             value[0] = '\0';
             strcpy(value, ptree[j++]);
             for (; j < i; j++) sprintf(value, "%s %s", value, ptree[j]);
+            nonstr = M4A_FALSE;
         }
         else
             strcpy(value, "true");
@@ -242,7 +247,8 @@ int m4a_display_json_tags(
 
         // Generate appropriate Prefix
         pfx[0] = '\0';
-        if (fst) strcat(pfx, "\",\n");
+        if (!nonstr) strcpy(pfx, "\"");
+        if (fst) strcat(pfx, ",\n");
         strcat(pfx, TABSPACE);
 
         m4a_stuff_backslash(value, sanitised);
@@ -250,6 +256,98 @@ int m4a_display_json_tags(
             out, 
            "%s%s: \"%s",
             pfx, atom, sanitised);
+
+
+        // Extract Cover art
+        if (strcmp(atom, "\"covr\"") == 0)
+        {
+            if (art != NULL)
+            {
+                const char *extn = NULL;
+                FILE  *fp;
+
+                fprintf(out, "\",\n%s\"@img\": [ ", TABSPACE);
+
+                if (path != NULL)
+                {
+                    char fname[512];
+                    int err = M4A_FALSE;
+
+                    for (i = 0; i < cnt; i++)
+                    {
+                        if ( art[i].type == M4A_PNG) 
+                        {
+                            extn = "png";
+                        }
+                        else if ( art[i].type == M4A_JPG) 
+                        {
+                            extn = "jpg";
+                        }
+                        sprintf(fname, "%s.%d.%s", path, i+1, extn);
+
+                        if ((fp = fopen(fname, "wb")) != NULL)
+                        {
+                            if (fwrite(art[i].data, art[i].size, 1, fp) !=
+                                art[i].size)
+                            {
+                                perror("img write:");
+                                err = M4A_TRUE;
+                            }
+                            fclose(fp);
+                        }
+                        else
+                        {
+                            perror("img create:");
+                            err = M4A_TRUE; 
+                        }
+
+                        if (i != 0) fputs(", ", out);
+                        if (err == M4A_TRUE)
+                            fputs("null", out);
+                        else
+                            fprintf(out, "\"%s\"", fname);
+                    }
+                }
+                else
+                {
+                    base64_encodestate  inst;
+                    char                bfr[M4A_B64_BFR_SZ*2];
+                    int                 clen;
+                    int                 blks;
+
+
+                    base64_init_encodestate(&inst);
+                    for (i = 0; i < cnt; i++)
+                    {
+                        blks = art[i].size/1024;
+                        fputs ("\"", out);
+                        for (j = 0; j < blks; j++)
+                        {
+                            clen = base64_encode_block(
+                                (const char*) &art[i].data[j * M4A_B64_BFR_SZ],
+                                M4A_B64_BFR_SZ,
+                                bfr,
+                                &inst);
+                            fwrite((void *)bfr, clen, 1, out);
+                        }
+
+                        clen = base64_encode_block(
+                            (const char*) &art[i].data[j * M4A_B64_BFR_SZ],
+                            art[i].size % M4A_B64_BFR_SZ,
+                            bfr,
+                            &inst);
+                        fwrite((void *)bfr, clen, 1, out);
+
+                        clen = base64_encode_blockend(bfr, &inst);
+                        fwrite((void *)bfr, clen, 1, out);
+                        if (i != 0) fputs(", ", out);
+                        fputs ("\"", out);
+                    }
+                }
+                fprintf (out, " ]");
+                nonstr = M4A_TRUE;
+            }
+        }
 
         fst = 1;
     }
@@ -259,7 +357,10 @@ int m4a_display_json_tags(
         char pfx[2];
 
         pfx[0] = '\0';
-        fprintf( out, "\",\n%s\"stream\": {", TABSPACE); 
+        if (!nonstr) strcpy(pfx, "\"");
+        if (fst) strcat(pfx, ",");
+        fprintf( out, "%s\n%s\"stream\": {", pfx, TABSPACE); 
+        pfx[0] = '\0';
         if (md5sum != NULL)
         {
             fprintf(
@@ -422,7 +523,7 @@ int m4a_get_atomidx(const char *name, int inst, int from)
 }
 
 
-int m4a_extract_art(int atmidx, char *img, int *type)
+int m4a_extract_art(int atmidx, M4A_ART *img)
 {
     char* art = (char*)malloc( 
         sizeof(char) * (parsedAtoms[atmidx].AtomicLength-16) +1 );
@@ -436,16 +537,17 @@ int m4a_extract_art(int atmidx, char *img, int *type)
         
     if (memcmp(art, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8) == 0) 
     {
-        *type = M4A_PNG;
+        img->type = M4A_PNG;
     }
     else if (memcmp(art, "\xFF\xD8\xFF\xE0", 4) == 0 || 
         memcmp(art, "\xFF\xD8\xFF\xE1", 4) == 0) 
     {
-        *type = M4A_JPG;
+        img->type = M4A_JPG;
     }
     else
         return 1;
         
-    img = art;
+    img->size = parsedAtoms[atmidx].AtomicLength-16;
+    img->data = art;
     return 0;
 }

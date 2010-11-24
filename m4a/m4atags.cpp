@@ -87,7 +87,7 @@ void strip_extn(const char *filepath, char* &basepath) {
 */
 
 
-#define USAGE "Usage:\n\tm4atags <[--literal | --verbose]> [--pix-path=<path>] [--with-md5sum | --with-sha1sum ] <m4a-media-file>\n\n"
+#define USAGE "Usage:\n\tm4atags <[--literal | --verbose]> [--extract-art=<path>] [--with-md5sum ] [ --with-sha1sum ] <m4a-media-file>\n\n"
 
 typedef struct 
 {
@@ -95,6 +95,7 @@ typedef struct
     int            md5sum;
     int            sha1sum;
     unsigned char  bfr[2][64];
+    int            art;
     char           pixpath[128];
     int            hckout[2];
     int            stdout_sav;
@@ -202,6 +203,7 @@ main (int argc, char **argv)
     cfg.mode           = M4A_MODE_INVALID;
     cfg.md5sum         = M4A_FALSE;
     cfg.sha1sum        = M4A_FALSE;
+    cfg.art            = M4A_FALSE;
     cfg.pixpath[0]     = '\0';
 
     while (1)
@@ -212,7 +214,8 @@ main (int argc, char **argv)
             {"verbose",        no_argument,       0, 'v'},
             {"with-md5sum",    no_argument,       0, 'm'},
             {"with-sha1sum",   no_argument,       0, 's'},
-            {"pix-path",       required_argument, 0, 'p'},
+            {"extract-art",    no_argument,       0, 'e'},
+            {"extract-art-to", required_argument, 0, 'p'},
             {"output",         required_argument, 0, 'o'},
             {"help",           no_argument,       0, 'h'},
             {"test",           no_argument,       0, 't'},
@@ -221,7 +224,7 @@ main (int argc, char **argv)
         /* getopt_long stores the option index. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "p:o:lvhtmsc",
+        c = getopt_long (argc, argv, "p:o:lvhtmse",
                long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -260,11 +263,16 @@ main (int argc, char **argv)
                 cfg.sha1sum = M4A_TRUE;
                 break;
 
+            case 'e':
+                cfg.art = M4A_TRUE;
+                break;
+
             case 'p':
                 printf ("option -p : ");
                 printf ("Not Yet Supported.....\n");
+                cfg.art = M4A_TRUE;
                 strcpy(cfg.pixpath, optarg);
-                return 20;
+                break;
 
             case 'o':
                 printf ("option -o with value `%s'\n", optarg);
@@ -280,8 +288,8 @@ main (int argc, char **argv)
                 return 20;
 
             default:
-                printf ("Invalid Option\n");
-                abort ();
+                fprintf (stderr, "Invalid Option\n%s\n", USAGE);
+                return 30;
         }
     }
 
@@ -314,10 +322,52 @@ main (int argc, char **argv)
     {
         unsigned char *md5sum   =  NULL;
         unsigned char *sha1sum  =  NULL;
+        int cnt                 =  0;
+        M4A_ART  *art           =  NULL;
+        M4A_ART                    bfr[M4A_MAX_ART];
+        char     *bfname        =  NULL;
+        char                       path[512];
 
 
         openSomeFile(m4afile, true);
         get_chksum(&cfg, m4afile, &md5sum, &sha1sum);
+
+        if (cfg.art == M4A_TRUE)
+        {
+            int   cvr;
+            int   idx;
+            int   ret;
+
+            cvr = m4a_get_atomidx((const char *) "covr", 1, 0);
+            idx = parsedAtoms[cvr].NextAtomNumber;
+            while (parsedAtoms[idx].AtomicLevel > parsedAtoms[cvr].AtomicLevel)
+            {
+                ret = m4a_extract_art(idx, &bfr[cnt]);
+                if (ret != 0) break;
+                cnt++;
+                idx = parsedAtoms[idx].NextAtomNumber;
+            }
+
+            if (cnt != 0) 
+            {
+                char tmp[512];
+
+                strcpy(tmp, m4afile);
+                if (cfg.pixpath[0] != '\0')
+                {
+                    char *bname;
+                    strcpy(path, cfg.pixpath);
+                    strcat(path, "/");
+                    bname = basename(tmp);
+                    strcat(path, bname);
+
+                    printf ("Fname: %s\n", path);
+                    bfname = path;
+                }
+                art = bfr;
+            }
+            
+        }
 
         redirect_io(&cfg);
         if (metadata_style >= THIRD_GEN_PARTNER) 
@@ -326,11 +376,11 @@ main (int argc, char **argv)
         } 
         else if (metadata_style == ITUNES_STYLE) 
         {
-            // don't try to extractPix
             APar_PrintDataAtoms(m4afile, NULL, 0, PRINT_DATA);
         }
         reset_io(&cfg);
-        m4a_display_json_tags(cfg.str, stdout, md5sum, sha1sum, NULL);
+        m4a_display_json_tags(
+            cfg.str, stdout, md5sum, sha1sum, art, cnt, bfname);
         openSomeFile(m4afile, false);
     }
     else if (cfg.mode == M4A_MODE_VERBOSE)
@@ -344,11 +394,7 @@ main (int argc, char **argv)
     {
         int mda;
         unsigned char  bfr[2][64];
-        int idx;
-        int type = 0;
-        char *img = NULL;
         int cvr;
-        int ret;
 
         mda = APar_DetermineMediaData_AtomPosition();
         printf ("Location of mdat: %d\n", mda);
@@ -358,16 +404,6 @@ main (int argc, char **argv)
 
         cvr = m4a_get_atomidx((const char *) "covr", 1, 0);
         printf("\n");
-        openSomeFile(m4afile, true);
-        idx = parsedAtoms[cvr].NextAtomNumber;
-        while (parsedAtoms[idx].AtomicLevel > parsedAtoms[cvr].AtomicLevel)
-        {
-            ret = m4a_extract_art(idx, img, &type);
-            if (ret == 0) break;
-            idx = parsedAtoms[idx].NextAtomNumber;
-        }
-        openSomeFile(m4afile, false);
-        printf("%d\n", type);
         
     }
     else

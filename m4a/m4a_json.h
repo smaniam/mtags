@@ -15,9 +15,20 @@
 #define M4A_CHKSUM_SHA1     2
 
 #define M4A_CHKSUM_BFR_SZ   128
+#define M4A_B64_BFR_SZ      1024
 
 #define M4A_PNG             1
 #define M4A_JPG             2
+
+
+#define M4A_MAX_ART         4
+
+typedef struct
+{
+    int  type;
+    unsigned int  size;
+    char *data;
+} M4A_ART;
 
 extern int m4a_display_json_tree(
     FILE *in,
@@ -28,7 +39,9 @@ extern int m4a_display_json_tags(
     FILE *out,
     unsigned char *md5sum,
     unsigned char *sha1sum,
-    char          *covr);
+    M4A_ART       *art,
+    int            cnt,
+    char          *path);
 
 extern int m4a_stream_chksum(
     char *fname, 
@@ -42,6 +55,6 @@ extern int m4a_get_atomidx(
     int inst,
     int from);
 
-extern int m4a_extract_art(int atmidx, char *img, int *type);
+extern int m4a_extract_art(int atmidx, M4A_ART *art);
 
 #endif
