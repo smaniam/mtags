@@ -176,6 +176,7 @@ int m4a_display_json_tags(
     int      fst = 0;
 
     
+    fprintf(out, "\{\n");
     while ((lnsz = getline(&line, &len, in)) != -1) 
     {
         char *tok;
@@ -227,7 +228,7 @@ int m4a_display_json_tags(
         }
         strcat(atom, "\"");
 
-        // For Covr it is enough to display value ass "true"
+        // For Covr it is enough to display value as "true"
         if (strcmp(atom, "\"covr\"") != 0)
         {
             j++;
