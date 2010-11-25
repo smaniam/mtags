@@ -167,6 +167,20 @@ void m4a_stuff_backslash(char *inp, char *out)
     }
 }
 
+
+int m4a_print_without_newlines(FILE *fp, char *data, int len)
+{
+    int i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (data[i] != '\n') fputc(data[i], fp);
+    }
+
+    return 0;
+}
+
+
 int m4a_display_json_tags(
     FILE *in,
     FILE *out,
@@ -287,7 +301,7 @@ int m4a_display_json_tags(
 
                         if ((fp = fopen(fname, "wb")) != NULL)
                         {
-                            if (fwrite(art[i].data, art[i].size, 1, fp) !=
+                            if (fwrite(art[i].data, 1, art[i].size, fp) !=
                                 art[i].size)
                             {
                                 perror("img write:");
@@ -328,7 +342,8 @@ int m4a_display_json_tags(
                                 M4A_B64_BFR_SZ,
                                 bfr,
                                 &inst);
-                            fwrite((void *)bfr, clen, 1, out);
+                            //fwrite((void *)bfr, clen, 1, out);
+                            m4a_print_without_newlines(out, bfr, clen);
                         }
 
                         clen = base64_encode_block(
@@ -336,10 +351,12 @@ int m4a_display_json_tags(
                             art[i].size % M4A_B64_BFR_SZ,
                             bfr,
                             &inst);
-                        fwrite((void *)bfr, clen, 1, out);
+                        //fwrite((void *)bfr, clen, 1, out);
+                        m4a_print_without_newlines(out, bfr, clen);
 
                         clen = base64_encode_blockend(bfr, &inst);
-                        fwrite((void *)bfr, clen, 1, out);
+                        //fwrite((void *)bfr, clen, 1, out);
+                        m4a_print_without_newlines(out, bfr, clen);
                         if (i != 0) fputs(", ", out);
                         fputs ("\"", out);
                     }
