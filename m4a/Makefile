@@ -2,10 +2,11 @@ APAR_HOME = ../lib/AtomicParsley
 APAR_OBJ_PATH = $(APAR_HOME)/obj_files
 
 MHASH_HOME = ../lib/mhash
+LIBB64_HOME = ../lib/libb64
 
-INC = -I$(APAR_HOME) -I$(MHASH_HOME)/include
-LIBPATH = -L$(MHASH_HOME)/lib/.libs
-LIBS = -lmhash
+INC = -I$(APAR_HOME) -I$(MHASH_HOME)/include -I$(LIBB64_HOME)/include
+LIBPATH = -L$(MHASH_HOME)/lib/.libs -L$(LIBB64_HOME)/src
+LIBS = -lmhash -lb64
 
 CC = g++
 
