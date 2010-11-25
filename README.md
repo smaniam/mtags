@@ -23,9 +23,9 @@ Warning: This is a work in progress things can change rapidly
     * No modifications to the existing Libraries (they are allowed to evolve)
     * Self contained build - No other external dependencies
   0. Options supported:
-        m4atags --literal [ --with-md5sum | --with-sha1sum ] <m4afile>
-        m4atags --verbose [ --with-md5sum | --with-sha1sum ] <m4afile>
-        m4atags --help
+    * `m4atags --literal [ --with-md5sum | --with-sha1sum ] <m4afile>`
+    * `m4atags --verbose [ --with-md5sum | --with-sha1sum ] <m4afile>`
+    * `m4atags --help`
   0. This release uses the Original AtomicParsley 0.9 and not the bitbucket fork
   0. Known Issues:
     * Compiling atomicparsley generates a lot of Warning messages (Ignore)
