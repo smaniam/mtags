@@ -354,7 +354,7 @@ int m4a_display_json_tags(
 
     if ((md5sum != NULL) || (sha1sum != NULL))
     {
-        char pfx[2];
+        char pfx[3];
 
         pfx[0] = '\0';
         if (!nonstr) strcpy(pfx, "\"");
