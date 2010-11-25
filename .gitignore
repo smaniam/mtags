@@ -3,3 +3,4 @@
 *.la
 obj_files
 .libs
+VisualStudioProject
