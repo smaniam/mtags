@@ -8,7 +8,7 @@ MHASH_CFG_OPTS = --disable-shared --disable-md4 --disable-md2 --disable-tiger --
 default:
 	@echo;
 	@echo "To Build m4atags"; echo "	1. Build Libraries: 	make libs";
-	@echo "	2. Build m4tags: 	make m4atags";
+	@echo "	2. Build m4atags: 	make m4atags";
 	@echo;
 m4atags:
 	cd m4a; make;
