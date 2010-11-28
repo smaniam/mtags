@@ -1,6 +1,8 @@
 MediaTags
 ====
 
+[Click here to lend your support to: mediatags - meta-data tags as JSON and make a donation at www.pledgie.com !][1]
+
 [![Click here to lend your support to: mediatags - meta-data tags as JSON and make a donation at www.pledgie.com !][2]][1]
 
 [1]: http://www.pledgie.com/campaigns/14039
