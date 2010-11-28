@@ -194,6 +194,7 @@ int m4a_display_json_tags(
     size_t   len = 0;
     ssize_t  lnsz;
     int      fst = 0;
+    char pfx[512];
 
     int      nonstr = M4A_FALSE;
 
@@ -202,7 +203,6 @@ int m4a_display_json_tags(
     {
         char *tok;
         char *ptree[64];
-        char pfx[512];
         int i, j;
         char atom[128];
         char value[256];
@@ -334,7 +334,7 @@ int m4a_display_json_tags(
                     for (i = 0; i < cnt; i++)
                     {
                         blks = art[i].size/1024;
-                        fputs ("\"", out);
+                        fprintf (out, "{ \"type\": \"%s\", \"data\": \"", extn);
                         for (j = 0; j < blks; j++)
                         {
                             clen = base64_encode_block(
@@ -358,7 +358,7 @@ int m4a_display_json_tags(
                         //fwrite((void *)bfr, clen, 1, out);
                         m4a_print_without_newlines(out, bfr, clen);
                         if (i != 0) fputs(", ", out);
-                        fputs ("\"", out);
+                        fputs ("\" }", out);
                     }
                 }
                 fprintf (out, " ]");
@@ -369,12 +369,11 @@ int m4a_display_json_tags(
         fst = 1;
     }
 
+    pfx[0] = '\0';
+    if (!nonstr) strcpy(pfx, "\"");
+
     if ((md5sum != NULL) || (sha1sum != NULL))
     {
-        char pfx[3];
-
-        pfx[0] = '\0';
-        if (!nonstr) strcpy(pfx, "\"");
         if (fst) strcat(pfx, ",");
         fprintf( out, "%s\n%s\"stream\": {", pfx, TABSPACE); 
         pfx[0] = '\0';
@@ -393,7 +392,7 @@ int m4a_display_json_tags(
         fprintf( out, " }\n}\n"); 
     }
     else
-        fprintf(out, "\"\n}\n");
+        fprintf(out, "%s\n}\n", pfx);
     if (line != NULL) free(line);
 
     return 0;

@@ -55,6 +55,12 @@ extern int m4a_get_atomidx(
     int inst,
     int from);
 
-extern int m4a_extract_art(int atmidx, M4A_ART *art);
+extern int m4a_extract_art(
+    int atmidx, 
+    M4A_ART *art);
+
+extern int m4a_print_without_newlines(
+    FILE *fp, char *data, 
+    int len);
 
 #endif

@@ -17,6 +17,10 @@
 #include <errno.h>
 #include <signal.h>
 #include <wchar.h>
+extern "C"
+{
+#include "b64/cencode.h"
+}
 
 
 #include "AP_commons.h"
@@ -87,7 +91,7 @@ void strip_extn(const char *filepath, char* &basepath) {
 */
 
 
-#define USAGE "Usage:\n\tm4atags <[--literal | --verbose]> [--extract-art=<path>] [--with-md5sum ] [ --with-sha1sum ] <m4a-media-file>\n\n"
+#define USAGE "Usage:\n\tm4atags [--literal [ --with-md5sum ] [ --with-sha1sum ] [ --extract-art | --extract-art-to=<path> ] [ --verbose ] [[ --extract-art | --extract-art=<path> ] | [ --with-md5sum ] [ --with-sha1sum ]] <m4a-media-file>\n\n"
 
 typedef struct 
 {
@@ -268,8 +272,6 @@ main (int argc, char **argv)
                 break;
 
             case 'p':
-                printf ("option -p : ");
-                printf ("Not Yet Supported.....\n");
                 cfg.art = M4A_TRUE;
                 strcpy(cfg.pixpath, optarg);
                 break;
@@ -361,7 +363,7 @@ main (int argc, char **argv)
                     bname = basename(tmp);
                     strcat(path, bname);
 
-                    printf ("Fname: %s\n", path);
+                    // printf ("Fname: %s\n", path);
                     bfname = path;
                 }
                 art = bfr;
@@ -430,6 +432,121 @@ main (int argc, char **argv)
                 }
                 printf(" }\n}\n"); 
             }
+        }
+        else if (cfg.art == M4A_TRUE)
+        {
+            M4A_ART   art[M4A_MAX_ART];
+            int       cvr;
+            int       idx;
+            int       ret;
+            int       cnt = 0;
+            char      path[512];
+            FILE      *fp;
+            FILE      *out = stdout;
+
+            if (cfg.pixpath[0] != '\0')
+            {
+                char tmp[256];
+                char *bname = NULL;
+
+                strcpy(tmp, m4afile);
+                strcpy(path, cfg.pixpath);
+                strcat(path, "/");
+                bname = basename(tmp);
+                strcat(path, bname);
+            }
+
+            fputs ("{\n    \"@img\": [ ", out);
+            openSomeFile(m4afile, true);
+            cvr = m4a_get_atomidx((const char *) "covr", 1, 0);
+            idx = parsedAtoms[cvr].NextAtomNumber;
+            while (parsedAtoms[idx].AtomicLevel > parsedAtoms[cvr].AtomicLevel)
+            {
+                int err = M4A_FALSE;
+                const char *extn  = NULL;
+
+                ret = m4a_extract_art(idx, &art[cnt]);
+                if (ret != 0) break;
+
+                if ( art[cnt].type == M4A_PNG) 
+                {
+                    extn = "png";
+                }
+                else if ( art[cnt].type == M4A_JPG) 
+                {
+                    extn = "jpg";
+                }
+
+                if (cfg.pixpath[0] != '\0')
+                {
+                    char       fname[512];
+
+                    sprintf(fname, "%s.%d.%s", path, cnt+1, extn);
+                    if ((fp = fopen(fname, "wb")) != NULL)
+                    {
+                        if (fwrite(art[cnt].data, 1, art[cnt].size, fp) !=
+                            art[cnt].size)
+                        {
+                            perror("img write:");
+                            err = M4A_TRUE;
+                        }
+                        fclose(fp);
+                    }
+                    else
+                    {
+                        perror("img create:");
+                        err = M4A_TRUE; 
+                    }
+
+                    if (cnt != 0) fputs(", ", out);
+                    if (err == M4A_TRUE)
+                        fputs("null", out);
+                    else
+                        fprintf(out, "\"%s\"", fname);
+
+                }
+                else
+                {
+                    base64_encodestate  inst;
+                    char                bfr[M4A_B64_BFR_SZ*2];
+                    int                 clen;
+                    int                 blks;
+                    int                 j;
+
+                    base64_init_encodestate(&inst);
+
+                    blks = art[cnt].size/1024;
+                    if (cnt != 0) fputs(", ", out);
+                    fprintf (out, "{\"type\": \"%s\", \"data\": \"", extn);
+                    for (j = 0; j < blks; j++)
+                    {
+                        clen = base64_encode_block(
+                            (const char*) &art[cnt].data[j * M4A_B64_BFR_SZ],
+                            M4A_B64_BFR_SZ,
+                            bfr,
+                            &inst);
+                        //fwrite((void *)bfr, clen, 1, out);
+                        m4a_print_without_newlines(out, bfr, clen);
+                    }
+
+                    clen = base64_encode_block(
+                        (const char*) &art[cnt].data[j * M4A_B64_BFR_SZ],
+                        art[cnt].size % M4A_B64_BFR_SZ,
+                        bfr,
+                        &inst);
+                    m4a_print_without_newlines(out, bfr, clen);
+
+                    clen = base64_encode_blockend(bfr, &inst);
+
+                    m4a_print_without_newlines(out, bfr, clen);
+                    if (cnt != 0) fputs(", ", out);
+                    fputs ("\"}", out);
+                }
+                cnt++;
+                idx = parsedAtoms[idx].NextAtomNumber;
+            }
+            openSomeFile(m4afile, false);
+            fputs (" ]\n}\n", out);
         }
     }
     exit (0);
