@@ -238,10 +238,11 @@ int m4a_display_json_tags(
         // Aggregate Token for Atom name
         atom[0] = '\0';
         j = 1;
-        ptree[j][strlen(ptree[j]) - 1] = '\0';
+        if (ptree[j][strlen(ptree[j]) - 1] == '\"')
+            ptree[j][strlen(ptree[j]) - 1] = '\0';
         while (strcmp(ptree[j], "contains:") != 0)
         {
-            strcat(atom, ptree[j]);
+            if (strcmp(ptree[j], "\"") != 0) strcat(atom, ptree[j]);
             j++;
         }
         strcat(atom, "\"");
