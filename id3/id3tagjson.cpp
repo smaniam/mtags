@@ -19,7 +19,6 @@ int Id3TagJson::verbose()
 
 int Id3TagJson::literal()
 {
-    std::cout << "Literal: Nothing for now!" << std::endl;
     JSONNODE *l = this->genLitTree();
 
     cout << json_write_formatted(l) << endl;
