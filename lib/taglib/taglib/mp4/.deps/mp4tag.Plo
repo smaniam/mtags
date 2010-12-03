@@ -1,0 +1,3 @@
+mp4tag.lo: mp4tag.cpp ../../config.h
+
+../../config.h:

@@ -1,0 +1,3 @@
+mp4file.lo: mp4file.cpp ../../config.h
+
+../../config.h:
