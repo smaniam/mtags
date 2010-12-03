@@ -49,6 +49,6 @@ cleanall:
 	cd $(MHASH_HOME); make clean;
 	cd $(APAR_HOME); rm -f AtomicParsley obj_files/*;
 	cd $(TAGLIB_HOME); make clean;
-	cd $(LIBJSON_HOME); rm -rf Objects libjson.a;
+	cd $(LIBJSON_HOME); rm -f Objects/* libjson.a;
 	cd $(M4A_HOME); make clean;
 	cd $(ID3_HOME); make clean;
