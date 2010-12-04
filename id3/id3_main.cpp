@@ -178,8 +178,8 @@ main (int argc, char **argv)
         return 1;
     }
 
-    Id3TagJson tags;
+    Id3TagJson tags(id3file);
 
-    tags.setFname(id3file);
+    //tags.setFname(id3file);
     if (cfg.getMode() == ID3_MODE_LITERAL) tags.literal();
 }

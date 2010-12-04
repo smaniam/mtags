@@ -1,7 +1,8 @@
 #include <iostream>
 #include <sstream>
 
-#include <tbytevector.h>
+//#include <tbytevector.h>
+#include <tstringlist.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
 #include <id3v1tag.h>
@@ -22,46 +23,70 @@ int Id3TagJson::literal()
     JSONNODE *l = this->genLitTree();
 
     cout << json_write_formatted(l) << endl;
+    json_delete(l);
+    
     return 0;
 }
 
 JSONNODE * Id3TagJson::genLitTree()
 {
-    MPEG::File f(this->fname.c_str());
-
-    ID3v2::Tag *id3v2tag = f.ID3v2Tag();
+    ID3v2::Tag *v2tag = this->mpgfile->ID3v2Tag();
     JSONNODE *json = json_new(JSON_NODE);
 
-    JSONNODE *j_id3v2 = NULL;
-    if (id3v2tag != NULL)
+    if (v2tag)
     {
-        j_id3v2 = json_new(JSON_NODE);
+
+        if (v2tag->frameList().size() == 0) goto V2DONE;
+        
+        JSONNODE *j_id3v2 = json_new(JSON_NODE);
         json_set_name(j_id3v2, "ID3v2");
 
-        string s("2.");
-
         std::stringstream ss;
+        TagLib::StringList  idlst;
 
-        ss << id3v2tag->header()->majorVersion();
-        s += ss.str() + ".";
-        ss.str("");
-        ss << id3v2tag->header()->revisionNumber();
-        s += ss.str();
-        json_push_back(j_id3v2, json_new_a("ver", s.c_str()));
-
-        ID3v2::FrameList::ConstIterator it = id3v2tag->frameList().begin();
-        for(; it != id3v2tag->frameList().end(); it++)
+        ID3v2::FrameList::ConstIterator it = v2tag->frameList().begin();
+        for(; it != v2tag->frameList().end(); it++)
         {
-            ss.str("");
-            ss << (*it)->frameID();
-            json_push_back(j_id3v2, json_new_a(ss.str().c_str(),
-                ((*it)->toString().to8Bit()).c_str()));
+            string name;
+            string value;
+            
+            String id = (*it)->frameID();
+            if (idlst.contains(id)) continue;
+            idlst.append(id);
+            //if (id == String("APIC")) cout << "Pic Found!!!\n";
+
+            name = id.to8Bit();
+            ID3v2::FrameList l = 
+                v2tag->frameListMap()[name.c_str()];
+            if (l.size() > 1)
+            {
+                JSONNODE *arr = json_new(JSON_ARRAY);
+                json_set_name(arr, id.to8Bit().c_str());
+                ID3v2::FrameList::ConstIterator lit = l.begin();
+                for (;lit != l.end(); lit++)
+                {
+                    String fid = (*lit)->frameID();
+                    name = fid.to8Bit();
+                    value = (*lit)->toString().to8Bit();
+                    json_push_back(arr,
+                        json_new_a(name.c_str(), value.c_str()));
+                }
+                json_push_back(j_id3v2, arr);
+            }
+            else
+            {
+                value = (*it)->toString().to8Bit();
+                json_push_back(j_id3v2, json_new_a(name.c_str(),
+                    value.c_str()));
+            }
         }
+
         json_push_back(json, j_id3v2);
     }
 
-    ID3v1::Tag *id3v1tag = f.ID3v1Tag();
-    if (id3v1tag != NULL)
+V2DONE:
+    ID3v1::Tag *id3v1tag = this->mpgfile->ID3v1Tag();
+    if (id3v1tag)
     {
         JSONNODE *j_id3v1 = json_new(JSON_NODE);
         json_set_name(j_id3v1, "ID3v1");
