@@ -38,8 +38,7 @@ Warning: This is a work in progress things can change rapidly
     * Compiling atomicparsley generates a lot of Warning messages (Ignore)
     * This was tested with a limited number of files (fetched from internet), 
     any help in obtaining some non-contraband stuff would be more than welcome
-    * id3tags is a limited release, PRIV tags are not clumped together as a
-    collection
+    * id3tags is a limited release
 
 Project Goals
 ====
