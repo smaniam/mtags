@@ -25,6 +25,8 @@ int Id3TagJson::verbose()
 }
 
 
+
+
 int Id3TagJson::literal()
 {
     JSONNODE *l = this->genLitTree();
@@ -34,6 +36,9 @@ int Id3TagJson::literal()
     
     return 0;
 }
+
+
+
 
 JSONNODE * Id3TagJson::genLitTree()
 {
@@ -58,15 +63,17 @@ JSONNODE * Id3TagJson::genLitTree()
             
             String id = (*it)->frameID();
             if (idlst.contains(id)) continue;
+            
             idlst.append(id);
-
             name = id.to8Bit();
+            
             ID3v2::FrameList l = 
                 v2tag->frameListMap()[name.c_str()];
             if (l.size() > 1)
             {
                 JSONNODE *arr = json_new(JSON_ARRAY);
                 json_set_name(arr, id.to8Bit().c_str());
+                
                 ID3v2::FrameList::ConstIterator lit = l.begin();
                 for (;lit != l.end(); lit++)
                 {
@@ -86,6 +93,7 @@ JSONNODE * Id3TagJson::genLitTree()
     }
 
 V2DONE:
+    
     ID3v1::Tag *v1tag = this->mpgfile->ID3v1Tag();
     if (v1tag)
     {
@@ -129,6 +137,9 @@ V2DONE:
     return json;
 }   
 
+
+
+
 JSONNODE * Id3TagJson::getFrmLitVal(TagLib::ID3v2::Frame *frm)
 {
     String id = frm->frameID();
@@ -147,6 +158,10 @@ JSONNODE * Id3TagJson::getFrmLitVal(TagLib::ID3v2::Frame *frm)
     json_set_a(json, value.c_str());
     return json;
 }
+
+
+
+
 
 JSONNODE * Id3TagJson::getPic(TagLib::ID3v2::Frame *frm)
 {
@@ -175,7 +190,7 @@ JSONNODE * Id3TagJson::getPic(TagLib::ID3v2::Frame *frm)
 
                 string img = pixpath + "/" + bname + "." +
                     pictype[picfrm->type()] + ".jpg";
-                cout << "Size::: " << b.size() << img << endl;
+
                 std::ofstream f(img.c_str(),
                     std::ios::out |std::ios::binary|std::ios::trunc);
                 if (f.is_open())

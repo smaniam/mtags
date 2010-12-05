@@ -26,6 +26,7 @@ class Id3TagJson
             this->art = false;
             this->pixpath.clear();
         };
+
         ~Id3TagJson() { delete mpgfile; };
         int verbose();
         int literal();
@@ -36,14 +37,15 @@ class Id3TagJson
         JSONNODE * genLitTree();
         JSONNODE * getPic(TagLib::ID3v2::Frame *frm);
         JSONNODE * getFrmLitVal(TagLib::ID3v2::Frame *frm);
-        void delnewline(char *buf, int len) {
+
+        void delnewline(char *buf, int len) 
+        {
             int i = 0, o = 0;
             
             while (i < len)
             {
                 if (buf[i] == '\n') i++;
-                else if (o < i)
-                    buf[o++] = buf[i++];
+                else if (o < i) buf[o++] = buf[i++];
                 else i++, o++;
             }
             buf[o] = '\n';

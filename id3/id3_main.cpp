@@ -1,7 +1,7 @@
 /*
 ********************************************************************************
 **
-**   ID3TAGS.CPP: Extracts ID3 style tags from any media file
+**   ID3TAGS.CPP: Extracts ID3 style tags from MP3 media file
 **                and displays it in JSON format
 **   AUTHOR:      smaniam@ymail.com
 **   LICENSE:     GNU GPL version 3
@@ -13,11 +13,6 @@
 #include <iostream>
 #include <string>
 #include <getopt.h>
-extern "C"
-{
-#include "b64/cencode.h"
-}
-
 
 #include "id3_jdefs.h"
 #include "id3tagjson.h"
