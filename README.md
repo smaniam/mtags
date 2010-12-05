@@ -31,7 +31,7 @@ Warning: This is a work in progress things can change rapidly
     * `m4atags [ --extract-art | --extract-art-to=<path> ] <m4afile>`
     * `m4atags --help`
   0. id3tags Options supported:
-    * `id3tags --literal <id3file>`
+    * `id3tags --literal [ --extract-art | --extract-art-to=<path> ] <id3file>`
     * `id3tags --help`
   0. This release uses the Original AtomicParsley 0.9 and not the bitbucket fork
   0. Known Issues:
