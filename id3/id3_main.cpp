@@ -33,7 +33,7 @@ using std::endl;
 
 
 //#define USAGE "Usage:\n\tid3tags [--literal [ --with-md5sum ] [ --with-sha1sum ] [ --extract-art | --extract-art-to=<path> ] [ --verbose ] [[ --extract-art | --extract-art=<path> ] | [ --with-md5sum ] [ --with-sha1sum ]] <id3-media-file>\n\n"
-#define USAGE "Usage:\n\tid3tags --literal <id3-media-file>\n\n"
+#define USAGE "Usage:\n\tid3tags --literal [ --extract-art | --extract-art-to=<path> ] <id3-media-file>\n\n"
 
 class Id3TagsCfg 
 {
@@ -49,9 +49,12 @@ public:
         md5sum         = false;
         sha1sum        = false;
         art            = false;
+        pixpath.clear();
     }
     ~Id3TagsCfg() {}
     int getMode() { return mode; }
+    bool getArt() { return art; }
+    string getPixPath() { return pixpath; }
 };
 
 
@@ -179,7 +182,9 @@ main (int argc, char **argv)
     }
 
     Id3TagJson tags(id3file);
+    tags.setExtractArt(cfg.getArt());
+    if (!cfg.getPixPath().empty()) 
+        tags.setPixPath(cfg.getPixPath().c_str());
 
-    //tags.setFname(id3file);
     if (cfg.getMode() == ID3_MODE_LITERAL) tags.literal();
 }
