@@ -1,0 +1,3 @@
+mp4properties.lo: mp4properties.cpp ../../config.h
+
+../../config.h:

@@ -238,10 +238,11 @@ int m4a_display_json_tags(
         // Aggregate Token for Atom name
         atom[0] = '\0';
         j = 1;
-        ptree[j][strlen(ptree[j]) - 1] = '\0';
+        if (ptree[j][strlen(ptree[j]) - 1] == '\"')
+            ptree[j][strlen(ptree[j]) - 1] = '\0';
         while (strcmp(ptree[j], "contains:") != 0)
         {
-            strcat(atom, ptree[j]);
+            if (strcmp(ptree[j], "\"") != 0) strcat(atom, ptree[j]);
             j++;
         }
         strcat(atom, "\"");
@@ -261,8 +262,11 @@ int m4a_display_json_tags(
 
         // Generate appropriate Prefix
         pfx[0] = '\0';
-        if (!nonstr) strcpy(pfx, "\"");
-        if (fst) strcat(pfx, ",\n");
+        if (fst) 
+        {
+            if (!nonstr) strcpy(pfx, "\""); 
+            strcat(pfx, ",\n");
+        }
         strcat(pfx, TABSPACE);
 
         m4a_stuff_backslash(value, sanitised);
@@ -334,6 +338,14 @@ int m4a_display_json_tags(
                     for (i = 0; i < cnt; i++)
                     {
                         blks = art[i].size/1024;
+                        if ( art[i].type == M4A_PNG) 
+                        {
+                            extn = "png";
+                        }
+                        else if ( art[i].type == M4A_JPG) 
+                        {
+                            extn = "jpg";
+                        }
                         fprintf (out, "{ \"type\": \"%s\", \"data\": \"", extn);
                         for (j = 0; j < blks; j++)
                         {
