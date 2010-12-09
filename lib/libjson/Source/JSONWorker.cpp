@@ -364,9 +364,6 @@ void JSONWorker::SpecialChar(const json_char * & pos, json_string & res){
 	   case JSON_TEXT('v'):	//vertical tab
 		  res += JSON_TEXT('\v');
 		  break;
-	   case JSON_TEXT('\''):	//apostrophe
-		  res += JSON_TEXT('\'');
-		  break;
 	   case JSON_TEXT('x'):   //hexidecimal ascii code
 		  res += Hex(++pos);
 		  break;
@@ -516,9 +513,6 @@ json_string JSONWorker::UnfixString(const json_string & value_t, bool flag){
 				break;
 			 case JSON_TEXT('\v'):	//vertical tab
 				res += JSON_TEXT("\\v");
-				break;
-			 case JSON_TEXT('\''):	//apostrophe
-				res += JSON_TEXT("\\\'");
 				break;
 			 default:
 				if (((json_uchar)(*p) < 32) || ((json_uchar)(*p) > 126)){
