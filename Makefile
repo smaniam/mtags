@@ -36,7 +36,7 @@ AtomicParsley:
 	cd $(APAR_HOME); ./build;
 
 taglib:
-	cd $(TAGLIB_HOME); ./configure --disable-shared --enable-static; make
+	cd $(TAGLIB_HOME); ./configure --disable-debug --disable-shared --enable-static; make
 
 libjson:
 	cd $(LIBJSON_HOME); make;
