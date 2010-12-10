@@ -20,6 +20,7 @@
 
 using std::string;
 using std::cout;
+using std::cerr;
 using std::endl;
 
 /*
@@ -115,7 +116,7 @@ main (int argc, char **argv)
 
             case 'v':
                 cfg.mode = ID3_MODE_VERBOSE;
-                cout << "Verbose mode not yet supported\n";
+                cerr << "Verbose mode not yet fully supported\n";
                 break;
 
             case 't':
@@ -137,7 +138,7 @@ main (int argc, char **argv)
             case 'p':
                 cfg.art = true;
                 cfg.pixpath = optarg;
-                cout << cfg.pixpath << endl;
+                //cout << cfg.pixpath << endl;
                 break;
 
             case 'o':
@@ -182,4 +183,6 @@ main (int argc, char **argv)
         tags.setPixPath(cfg.getPixPath().c_str());
 
     if (cfg.getMode() == ID3_MODE_LITERAL) tags.literal();
+    else if (cfg.getMode() == ID3_MODE_VERBOSE) tags.verbose();
+    else if (cfg.getArt()) tags.albumart();
 }
