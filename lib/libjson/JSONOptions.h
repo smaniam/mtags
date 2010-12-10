@@ -81,7 +81,7 @@
  *  JSON_BINARY is used to support binary, which is base64 encoded and decoded by libjson,
  *  if this option is not turned on, no base64 support is included
  */
-//#define JSON_BINARY
+#define JSON_BINARY
 
 
 /*
