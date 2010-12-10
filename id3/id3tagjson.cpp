@@ -202,7 +202,7 @@ JSONNODE * Id3TagJson::getPic(TagLib::ID3v2::Frame *frm)
                 }
                 else
                 {
-                    std::cerr << "Unable to open File\n";
+                    std::cerr << "Unable to open file: " << img << "\n";
                 }
             }
             else
@@ -241,3 +241,55 @@ JSONNODE * Id3TagJson::getPic(TagLib::ID3v2::Frame *frm)
         }
         return json;
 }
+
+int Id3TagJson::albumart()
+{
+    ID3v2::Tag *v2tag = this->mpgfile->ID3v2Tag();
+    JSONNODE *json;
+
+    if (v2tag)
+    {
+        if (v2tag->frameList().size() == 0) goto NOPICS;
+        
+        ID3v2::FrameList::ConstIterator it = v2tag->frameList().begin();
+        for(; it != v2tag->frameList().end(); it++)
+        {
+            string name;
+            string value;
+            
+            String id = (*it)->frameID();
+
+            if (!(id == String("APIC"))) continue;
+
+            json = json_new(JSON_NODE);
+            name = id.to8Bit();
+            
+            ID3v2::FrameList l = 
+                v2tag->frameListMap()[name.c_str()];
+            if (l.size() > 1)
+            {
+                JSONNODE *arr = json_new(JSON_ARRAY);
+                json_set_name(arr, id.to8Bit().c_str());
+                
+                ID3v2::FrameList::ConstIterator lit = l.begin();
+                for (;lit != l.end(); lit++)
+                {
+                    JSONNODE *node = getFrmLitVal((*lit));
+                    json_push_back(arr, node);
+                }
+                json_push_back(json, arr);
+            }
+            else
+            {
+                JSONNODE *node = getFrmLitVal((*it));
+                json_push_back(json, node);
+            }
+
+            cout << json_write_formatted(json) << endl;
+            json_delete(json);
+        }
+    }
+
+NOPICS:
+    return 0;
+}   

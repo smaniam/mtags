@@ -30,6 +30,7 @@ class Id3TagJson
         ~Id3TagJson() { delete mpgfile; };
         int verbose();
         int literal();
+        int albumart();
         void setPixPath(const char *path) { this->pixpath.assign(path); };
         void setExtractArt(bool val) { this->art = val; };
 

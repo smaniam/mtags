@@ -137,7 +137,7 @@ main (int argc, char **argv)
             case 'p':
                 cfg.art = true;
                 cfg.pixpath = optarg;
-                cout << cfg.pixpath << endl;
+                //cout << cfg.pixpath << endl;
                 break;
 
             case 'o':
@@ -182,4 +182,5 @@ main (int argc, char **argv)
         tags.setPixPath(cfg.getPixPath().c_str());
 
     if (cfg.getMode() == ID3_MODE_LITERAL) tags.literal();
+    else if (cfg.getArt()) tags.albumart();
 }
