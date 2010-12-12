@@ -357,9 +357,13 @@ int Id3TagJson::checksum()
 {
     JSONNODE *c = this->getChkSum();
 
-    cout << json_write_formatted(c) << endl;
-    json_delete(c);
-    
+    if (c == NULL)  return 1;
+
+    JSONNODE * v = json_new(JSON_NODE);
+    json_push_back(v, c);
+    cout << json_write_formatted(v) << endl;
+    json_delete(v);
+
     return 0;
 }
 
@@ -653,20 +657,25 @@ JSONNODE * Id3TagJson::getChkSum()
     }
 
     getLocation(v2beg, v2len, dbeg, dlen, v1beg, v1len, apebeg, apelen);
+    if (dlen == 0) return NULL;
 
     f.seekg(dbeg, std::ios::beg);
-    while (f.read((char *)bfr, ID3_CHKSUM_BFR_SZ))
+    long   cnt = dlen / ID3_CHKSUM_BFR_SZ;
+    long   rmn = dlen % ID3_CHKSUM_BFR_SZ;
+
+    while ((f.read((char *)bfr, ID3_CHKSUM_BFR_SZ)) && (cnt > 0))
     {
         if (md5) mhash(mdd, bfr, ID3_CHKSUM_BFR_SZ);
         if (sha1) mhash(shd, bfr, ID3_CHKSUM_BFR_SZ);
+        cnt--;
     }
 
-    if (!f)
+    if (f.read((char *)bfr, rmn))
     {
-        if (md5) mhash(mdd, bfr, f.gcount());
-        if (sha1) mhash(shd, bfr, f.gcount());
+        if (md5) mhash(mdd, bfr, rmn);
+        if (sha1) mhash(shd, bfr, rmn);
     }
-
+    f.close();
 
     JSONNODE  *node = json_new(JSON_NODE);
     json_set_name(node, "stream");
