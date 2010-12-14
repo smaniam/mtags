@@ -20,6 +20,7 @@
 
 using std::string;
 using std::cout;
+using std::cerr;
 using std::endl;
 
 /*
@@ -27,8 +28,8 @@ using std::endl;
 */
 
 
-//#define USAGE "Usage:\n\tid3tags [--literal [ --with-md5sum ] [ --with-sha1sum ] [ --extract-art | --extract-art-to=<path> ] [ --verbose ] [[ --extract-art | --extract-art=<path> ] | [ --with-md5sum ] [ --with-sha1sum ]] <id3-media-file>\n\n"
-#define USAGE "Usage:\n\tid3tags --literal [ --extract-art | --extract-art-to=<path> ] <id3-media-file>\n\n"
+#define USAGE "Usage:\n\tid3tags [--literal [ --with-md5sum ] [ --with-sha1sum ] [ --extract-art | --extract-art-to=<path> ] [ --verbose ] [[ --extract-art | --extract-art=<path> ] | [ --with-md5sum ] [ --with-sha1sum ]] <id3-media-file>\n\n"
+//#define USAGE "Usage:\n\tid3tags --literal [ --extract-art | --extract-art-to=<path> ] <id3-media-file>\n\n"
 
 class Id3TagsCfg 
 {
@@ -36,7 +37,6 @@ public:
     int            mode;
     bool           md5sum;
     bool           sha1sum;
-    unsigned char  bfr[2][64];
     bool           art;
     string         pixpath;
     Id3TagsCfg() {
@@ -49,6 +49,8 @@ public:
     ~Id3TagsCfg() {}
     int getMode() { return mode; }
     bool getArt() { return art; }
+    bool getMD5() { return md5sum; }
+    bool getSHA1() { return sha1sum; }
     string getPixPath() { return pixpath; }
 };
 
@@ -115,7 +117,6 @@ main (int argc, char **argv)
 
             case 'v':
                 cfg.mode = ID3_MODE_VERBOSE;
-                cout << "Verbose mode not yet supported\n";
                 break;
 
             case 't':
@@ -137,7 +138,7 @@ main (int argc, char **argv)
             case 'p':
                 cfg.art = true;
                 cfg.pixpath = optarg;
-                cout << cfg.pixpath << endl;
+                //cout << cfg.pixpath << endl;
                 break;
 
             case 'o':
@@ -180,6 +181,11 @@ main (int argc, char **argv)
     tags.setExtractArt(cfg.getArt());
     if (!cfg.getPixPath().empty()) 
         tags.setPixPath(cfg.getPixPath().c_str());
+    if (cfg.getMD5()) tags.setChkSum(ID3_CHKSUM_MD5);
+    if (cfg.getSHA1()) tags.setChkSum(ID3_CHKSUM_SHA1);
 
     if (cfg.getMode() == ID3_MODE_LITERAL) tags.literal();
+    else if (cfg.getMode() == ID3_MODE_VERBOSE) tags.verbose();
+    else if (cfg.getArt()) tags.albumart();
+    else if (cfg.getMD5() || cfg.getSHA1()) tags.checksum();
 }
