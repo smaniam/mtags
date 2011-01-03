@@ -7,12 +7,12 @@ Date: 2010-11-20
 
 Please report issues to the [coolaj86's branch](https://github.com/coolaj86/mtags).
 
-Version 0.3
+Version 0.31
 ====
 
 Warning: This is a work in progress things can change rapidly
 
-  0. Current support is for m4atags and id3tags(limited) only
+  0. Current support is for m4atags and id3tags only
   0. m4atags is dependent on AtomicParsley and mhash (both are bundled)
   0. id3tags is dependent on TagLib and libjson (both are bundled)
   0. Building m4atags and id3tags for the very first time:
@@ -31,14 +31,16 @@ Warning: This is a work in progress things can change rapidly
     * `m4atags [ --extract-art | --extract-art-to=<path> ] <m4afile>`
     * `m4atags --help`
   0. id3tags Options supported:
-    * `id3tags --literal [ --extract-art | --extract-art-to=<path> ] <id3file>`
+    * `id3tags --literal [ --with-md5sum ] [ --with-sha1sum ] [ --extract-art | --extract-art-to=<path> ] <id3file>`
+    * `m4atags --verbose <id3file>`
+    * `id3tags [ --with-md5sum ] [ --with-sha1sum ] <m4afile>`
+    * `id3tags [ --extract-art | --extract-art-to=<path> ] <m4afile>`
     * `id3tags --help`
   0. This release uses the Original AtomicParsley 0.9 and not the bitbucket fork
   0. Known Issues:
     * Compiling atomicparsley generates a lot of Warning messages (Ignore)
     * This was tested with a limited number of files (fetched from internet), 
     any help in obtaining some non-contraband stuff would be more than welcome
-    * id3tags is a limited release
 
 Project Goals
 ====
