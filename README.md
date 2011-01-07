@@ -10,16 +10,16 @@ MediaTags
 
 Author: smaniam@ymail.com
 
-Date: 2010-11-20
+Date: 2011-01-07
 
 Please report issues to the [coolaj86's branch](https://github.com/coolaj86/mtags).
 
-Version 0.31
+Version 0.32
 ====
 
 Warning: This is a work in progress things can change rapidly
 
-  0. Current support is for m4atags and id3tags only
+  0. Current support is for m4atags, id3tags and imgtags(partial) only
   0. m4atags is dependent on AtomicParsley and mhash (both are bundled)
   0. id3tags is dependent on TagLib and libjson (both are bundled)
   0. Building m4atags and id3tags for the very first time:
@@ -43,7 +43,10 @@ Warning: This is a work in progress things can change rapidly
     * `id3tags [ --with-md5sum ] [ --with-sha1sum ] <id3file>`
     * `id3tags [ --extract-art | --extract-art-to=<path> ] <id3file>`
     * `id3tags --help`
+  0. imgtags Options supported:
+    * `imgtags --literal=[e|i|x] <imgfile>`
   0. This release uses the Original AtomicParsley 0.9 and not the bitbucket fork
+  0. libexiv2 requires expat (libexpat-dev) for XMP support
   0. Known Issues:
     * Compiling atomicparsley generates a lot of Warning messages (Ignore)
     * This was tested with a limited number of files (fetched from internet), 
