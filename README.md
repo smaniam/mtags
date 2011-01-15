@@ -12,15 +12,17 @@ Version 0.32
 
 Warning: This is a work in progress things can change rapidly
 
-  0. Current support is for m4atags, id3tags and imgtags(partial) only
+  0. Current support is for m4atags, id3tags and imgtags only
   0. m4atags is dependent on AtomicParsley and mhash (both are bundled)
   0. id3tags is dependent on TagLib and libjson (both are bundled)
-  0. Building m4atags and id3tags for the very first time:
+  0. imgtags is dependent on libexiv2 and libjson (both are bundled)
+  0. Building m4atags, id3tags and imgtags for the very first time:
     * Type: make libs
     * Type: make mediatags
   0. Executables are statically linked with the libs and have no execution dependencies
   0. m4atags binary is located in the m4a directory
   0. id3tags binary is located in the id3 directory
+  0. imgtags binary is located in the img directory
   0. Design philosophy:
     * No modifications to the existing Libraries (they are allowed to evolve)
     * Self contained build - No other external dependencies
@@ -37,9 +39,12 @@ Warning: This is a work in progress things can change rapidly
     * `id3tags [ --extract-art | --extract-art-to=<path> ] <id3file>`
     * `id3tags --help`
   0. imgtags Options supported:
-    * `imgtags --literal=[e|i|x] <imgfile>`
+    * `imgtags --literal=[e|i|x] [ --with-md5sum ] [ --with-sha1sum ] <imgfile>`
+    * `imgtags --verbose <imgfile>`
+    * `imgtags [ --with-md5sum ] [ --with-sha1sum ] <imgfile>`
   0. This release uses the Original AtomicParsley 0.9 and not the bitbucket fork
   0. libexiv2 requires expat (libexpat-dev) for XMP support
+  0. imgtags supports verbose and checksum mode for JPG files only
   0. Known Issues:
     * Compiling atomicparsley generates a lot of Warning messages (Ignore)
     * This was tested with a limited number of files (fetched from internet), 
