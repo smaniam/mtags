@@ -74,7 +74,16 @@ inline JSONNODE * vNode(VbsData *data)
 
 int ImgTagJson::literal()
 {
-    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(fname);
+    Exiv2::Image::AutoPtr image;
+    try
+    {
+        image = Exiv2::ImageFactory::open(fname);
+    }
+    catch (Exiv2::Error& e)
+    {
+        cerr << "Invalid file: " << fname << endl;
+        return 6;
+    }
     if (image.get() == 0) return 1;
 
     image->readMetadata();
@@ -124,7 +133,7 @@ JSONNODE *ImgTagJson::genLitExif(const Exiv2::Image::AutoPtr & image)
     JMAP *grpmap = new JMAP();
 
     JSONNODE *tree = json_new(JSON_NODE);
-    json_set_name(tree, "Exif");
+    json_set_name(tree, "exif");
     for (Exiv2::ExifData::const_iterator i = data.begin(); i != end; i++)
     {
         JSONNODE *grp;
@@ -234,7 +243,7 @@ JSONNODE *ImgTagJson::genLitIptc(const Exiv2::Image::AutoPtr & image)
         //cout << it->first << endl;
     delete grpmap;
     //cout << json_write_formatted(tree) << endl;
-    json_set_name(tree, "Iptc");
+    json_set_name(tree, "iptc");
     return tree;
 }
 
@@ -296,7 +305,7 @@ JSONNODE *ImgTagJson::genLitXmp(const Exiv2::Image::AutoPtr & image)
         //cout << it->first << endl;
     delete grpmap;
     //cout << json_write_formatted(tree) << endl;
-    json_set_name(tree, "Xmp");
+    json_set_name(tree, "xmp");
     return tree;
 }
 
@@ -448,7 +457,7 @@ int ImgTagJson::getTagPos()
                  s_sec[s_secrd-1].Type = M_SOF0;
                 break;
             default:
-                 cerr << "Other JPEG Section marker " << marker << endl;
+                 //cerr << "Other JPEG Section marker " << marker << endl;
                  s_secrd--; // Ignoring for now
                 break;
         }
@@ -570,10 +579,6 @@ JSONNODE * ImgTagJson::getChkSum()
 
     if (dlen == 0) return NULL;
 
-    std::ifstream f(fname.c_str(), std::ios::in|std::ios::binary);
-
-    if (!f.is_open()) return NULL;
-
     if (md5)
     {
         mdd = mhash_init(MHASH_MD5);
@@ -586,6 +591,8 @@ JSONNODE * ImgTagJson::getChkSum()
         if (shd == MHASH_FAILED) return NULL;
     }
 
+    std::ifstream f(fname.c_str(), std::ios::in|std::ios::binary);
+    if (!f.is_open()) return NULL;
 
     f.seekg(dbeg, std::ios::beg);
     long   cnt = dlen / IMG_B64_BFR_SZ;
