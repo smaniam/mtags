@@ -196,7 +196,7 @@ main (int argc, char **argv)
     if ((((cfg.getMode() & IMG_MODE_LITERAL) != 0) &&
         ((cfg.getMode() & IMG_MODE_VERBOSE) != 0)) ||
         (((!cfg.getLit()) && (!cfg.getVer())) &&
-        ((!cfg.getMD5()) && (!cfg.getMD5()))))
+        ((!cfg.getMD5()) && (!cfg.getSHA1()))))
     {
         fprintf(stderr, "%s: select either --verbose or --literal\n", argv[0]);
         fprintf(stderr, "\t or select --with-md5sum and/or --with-sha1sum\n");
