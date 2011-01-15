@@ -28,8 +28,8 @@ using std::endl;
 */
 
 
-// #define USAGE "Usage:\n\timgtags [--literal [ --with-md5sum ] [ --with-sha1sum ] [ --extract-art | --extract-art-to=<path> ] [ --verbose ] [[ --extract-art | --extract-art=<path> ] | [ --with-md5sum ] [ --with-sha1sum ]] <img-media-file>\n\n"
-#define USAGE "Usage:\n\timgtags --literal=[e|x|i] <img-media-file>\n\n"
+#define USAGE "Usage:\n\timgtags [--literal=[[exif | e] | [iptc | i] | [xmp | x]] [ --with-md5sum ] [ --with-sha1sum ]] [ --verbose ] [[ --with-md5sum ] [ --with-sha1sum ]] <img-media-file>\n\n"
+//#define USAGE "Usage:\n\timgtags --literal=[e|x|i] <img-media-file>\n\n"
 
 class ImgTagsCfg 
 {
@@ -210,11 +210,10 @@ main (int argc, char **argv)
     tags.setXmp(cfg.getXmp());
     tags.setExif(cfg.getExif());
     tags.setIptc(cfg.getIptc());
-    if (cfg.getMode() == IMG_MODE_LITERAL) tags.literal();
-/*
+    tags.setMD5(cfg.getMD5());
+    tags.setSHA1(cfg.getSHA1());
+
     if (cfg.getMode() == IMG_MODE_LITERAL) tags.literal();
     else if (cfg.getMode() == IMG_MODE_VERBOSE) tags.verbose();
-    else if (cfg.getArt()) tags.albumart();
     else if (cfg.getMD5() || cfg.getSHA1()) tags.checksum();
-*/
 }
