@@ -28,8 +28,8 @@ using std::endl;
 */
 
 
-// #define USAGE "Usage:\n\timgtags [--literal [ --with-md5sum ] [ --with-sha1sum ] [ --extract-art | --extract-art-to=<path> ] [ --verbose ] [[ --extract-art | --extract-art=<path> ] | [ --with-md5sum ] [ --with-sha1sum ]] <img-media-file>\n\n"
-#define USAGE "Usage:\n\timgtags --literal=[e|x|i] <img-media-file>\n\n"
+#define USAGE "Usage:\n\timgtags [--literal=[[exif | e] | [iptc | i] | [xmp | x]] [ --with-md5sum ] [ --with-sha1sum ]] [ --verbose ] [[ --with-md5sum ] [ --with-sha1sum ]] <img-media-file>\n\n"
+//#define USAGE "Usage:\n\timgtags --literal=[e|x|i] <img-media-file>\n\n"
 
 class ImgTagsCfg 
 {
@@ -55,6 +55,8 @@ public:
     bool getIptc() { return iptc; }
     bool getMD5()  { return md5sum; }
     bool getSHA1() { return sha1sum; }
+    bool getLit() { return ((mode & IMG_MODE_LITERAL) != 0); };
+    bool getVer() { return ((mode & IMG_MODE_VERBOSE) != 0); };
 };
 
 
@@ -113,7 +115,7 @@ main (int argc, char **argv)
                 break;
 
             case 'l':
-                cfg.mode = IMG_MODE_LITERAL;
+                cfg.mode |= IMG_MODE_LITERAL;
                 if (optarg == NULL)
                 {
                     cfg.exif = true;
@@ -136,17 +138,20 @@ main (int argc, char **argv)
                     cfg.xmp = true;
                 }
                 else
-                    fprintf (stderr, "Option %s: Not Supported.....\n", optarg);
-                 
+                {
+                    fprintf (stderr, 
+                        "-l: argument %s is not Supported.....\n", optarg);
+                    fprintf(stderr, "%s\n", USAGE);
+                    return 1;
+                }
                 break;
 
             case 'v':
-                fprintf (stderr, "Option %c: Not Yet Supported.....\n", c);
-                cfg.mode = IMG_MODE_VERBOSE;
+                cfg.mode |= IMG_MODE_VERBOSE;
                 break;
 
             case 't':
-                cfg.mode = IMG_MODE_TESTING;
+                cfg.mode |= IMG_MODE_TESTING;
                 break;
 
             case 'm':
@@ -188,6 +193,24 @@ main (int argc, char **argv)
         }
     }
 
+    if ((((cfg.getMode() & IMG_MODE_LITERAL) != 0) &&
+        ((cfg.getMode() & IMG_MODE_VERBOSE) != 0)) ||
+        (((!cfg.getLit()) && (!cfg.getVer())) &&
+        ((!cfg.getMD5()) && (!cfg.getSHA1()))))
+    {
+        fprintf(stderr, "%s: select either --verbose or --literal\n", argv[0]);
+        fprintf(stderr, "\t or select --with-md5sum and/or --with-sha1sum\n");
+        fprintf(stderr, "%s\n", USAGE);
+        return 2;
+    }
+    if ((cfg.getMode() == IMG_MODE_VERBOSE) && (cfg.getMD5() || cfg.getSHA1()))
+    {
+        fprintf(stderr, "%s: checksum not supported in --verbose mode\n",
+            argv[0]);
+        fprintf(stderr, "%s\n", USAGE);
+        return 3;
+    }
+
     /* Grab File names*/
     if (optind < argc)
     {
@@ -210,11 +233,12 @@ main (int argc, char **argv)
     tags.setXmp(cfg.getXmp());
     tags.setExif(cfg.getExif());
     tags.setIptc(cfg.getIptc());
-    if (cfg.getMode() == IMG_MODE_LITERAL) tags.literal();
-/*
-    if (cfg.getMode() == IMG_MODE_LITERAL) tags.literal();
-    else if (cfg.getMode() == IMG_MODE_VERBOSE) tags.verbose();
-    else if (cfg.getArt()) tags.albumart();
-    else if (cfg.getMD5() || cfg.getSHA1()) tags.checksum();
-*/
+    tags.setMD5(cfg.getMD5());
+    tags.setSHA1(cfg.getSHA1());
+
+    if (cfg.getLit()) return tags.literal();
+    else if (cfg.getMode() == IMG_MODE_VERBOSE) return tags.verbose();
+    else if (cfg.getMD5() || cfg.getSHA1()) return tags.checksum();
+
+    return 4;
 }

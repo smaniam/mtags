@@ -7,8 +7,8 @@
 #define IMG_MODE_INVALID    0
 #define IMG_MODE_LITERAL    1
 #define IMG_MODE_VERBOSE    2
-#define IMG_MODE_BINARY     3
-#define IMG_MODE_TESTING    4
+#define IMG_MODE_BINARY     4
+#define IMG_MODE_TESTING    8
 
 #define IMG_CHKSUM_NONE     0
 #define IMG_CHKSUM_MD5      1

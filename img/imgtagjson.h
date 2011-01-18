@@ -8,6 +8,14 @@
 
 using std::string;
 
+enum TTYPE {
+    EXIF = 0,
+    XMP,
+    IPTC,
+    JFIF,
+    DATA,
+    TTCNT
+};
 
 class ImgTagJson
 {
@@ -19,6 +27,12 @@ class ImgTagJson
         bool    exif;
         bool    xmp;
         bool    iptc;
+        struct
+        {
+            bool valid;
+            long pos;
+            long len;
+        } tloc[TTCNT];
 
     public:
         ImgTagJson(char *fname)
@@ -30,24 +44,30 @@ class ImgTagJson
             this->xmp = true;
             this->exif = true;
             this->iptc= true;
+            for(int i = 0; i < TTCNT; i++)
+                this->tloc[i].valid = false;
         };
 
         ~ImgTagJson() {};
-        int verbose(){ return 0;};
+        int verbose();
         int literal();
-        int checksum(){ return 0;};
+        int checksum();
         void setPixPath(const char *path) { this->pixpath.assign(path); };
         void setXmp(bool mode) { this->xmp = mode; };
         void setExif(bool mode) { this->exif = mode; };
         void setIptc(bool mode) { this->iptc = mode; };
+        void setMD5(bool mode) { this->md5 = mode; };
+        void setSHA1(bool mode) { this->sha1 = mode; };
 
     private:
         //JSONNODE * genLitExif(const Exiv2::ExifData &exif);
         JSONNODE * genLitExif(const Exiv2::Image::AutoPtr & image);
         JSONNODE * genLitIptc(const Exiv2::Image::AutoPtr & image);
         JSONNODE * genLitXmp(const Exiv2::Image::AutoPtr & image);
+        JSONNODE * getChkSum();
         long       getFileSz();
         void       delnewline(char *buf, int len);
+        int        getTagPos();
 };
 
 
