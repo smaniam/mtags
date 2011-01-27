@@ -12,10 +12,11 @@ Version 0.32
 
 Warning: This is a work in progress things can change rapidly
 
-  0. Current support is for m4atags, id3tags and imgtags only
+  0. Current support is for m4atags, id3tagsi, imgtags and pdftags
   0. m4atags is dependent on AtomicParsley and mhash (both are bundled)
   0. id3tags is dependent on TagLib and libjson (both are bundled)
   0. imgtags is dependent on libexiv2 and libjson (both are bundled)
+  0. pdftags is dependent on libpoppler - This is not bundled in this release
   0. Building m4atags, id3tags and imgtags for the very first time:
     * Type: make libs
     * Type: make mediatags
@@ -42,6 +43,11 @@ Warning: This is a work in progress things can change rapidly
     * `imgtags --literal=[e|i|x] [ --with-md5sum ] [ --with-sha1sum ] <imgfile>`
     * `imgtags --verbose <imgfile>`
     * `imgtags [ --with-md5sum ] [ --with-sha1sum ] <imgfile>`
+    * `imgtags --help`
+  0. pdftags Options supported:
+    * `pdftags --literal <pdffile>`
+    * `pdftags --verbose <pdffile>`
+    * `pdftags --help`
   0. This release uses the Original AtomicParsley 0.9 and not the bitbucket fork
   0. libexiv2 requires expat (libexpat-dev) for XMP support
   0. imgtags supports verbose and checksum mode for JPG files only
@@ -49,6 +55,8 @@ Warning: This is a work in progress things can change rapidly
     * Compiling atomicparsley generates a lot of Warning messages (Ignore)
     * This was tested with a limited number of files (fetched from internet), 
     any help in obtaining some non-contraband stuff would be more than welcome
+  0. Dependencies:
+    * Compiling pdftags requires libpoppler (libpoppler-dev package)
 
 Project Goals
 ====
