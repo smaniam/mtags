@@ -558,47 +558,6 @@ static int getsect(const char *fname, VbsData &hdr, VBS &xref, VBS &body)
 
 int PdfTagJson::verbose()
 {
-    /*
-    PDFDoc *doc;
-    GooString *gfname = new GooString(this->fname.c_str());
-
-    doc = PDFDocFactory().createPDFDoc(*gfname, NULL, NULL);
-
-    Object *obj;
-
-    if (!doc->isOk())
-    {
-        cerr << "Invalid file: " << this->fname << endl;
-        return 1;
-    }
-    
-    Guint sxref = getstartxref(doc, this->fname.c_str());
-    cout << "Start XREF: " << sxref << endl;
-    
-    XRef *xref = doc->getXRef();
-    obj = doc->getXRef()->getTrailerDict();
-    if (obj->isDict())
-    {
-        cout << "Trailer Dict\n";
-        Dict *d = obj->getDict();
-        int len = d->getLength();
-        cout << "Len: " << len << endl;
-        Object prev;
-        if (d->lookup((char *)"Prev", &prev))
-        {
-            if (prev.isInt())
-            {
-                cout << "Prev: " << prev.getInt() << endl;
-                // int prex = xref->getNumEntry(prev.getInt());
-                // cout << "Num Entry: " << prex << "\tType: " <<
-                //    xref->getEntry(prex)->obj.getType() <<
-                //    endl;
-                
-            }
-        }
-        
-    }*/
-    
     VbsData hdr;
     VBS xref;
     VBS body;
@@ -612,21 +571,7 @@ int PdfTagJson::verbose()
     JSONNODE * v = json_new(JSON_NODE);
     hdr.name = "header";
     json_push_back(v, vNode(&hdr));
-    
-    if (xref.size() == 1)
-    {
-        xref[0]->name = "xref";
-        json_push_back(v, vNode(xref[0]));
-    }
-    else if (xref.size() > 0)
-    {
-        JSONNODE *a = json_new(JSON_ARRAY);
-        json_set_name(a, "xref");
-        for (int i = 0; i < xref.size(); i ++)
-            json_push_back(a, vNode(xref[i]));
-        json_push_back(v, a);
-    }
-    
+
     if (body.size() == 1)
     {
         body[0]->name = "body";
@@ -638,6 +583,20 @@ int PdfTagJson::verbose()
         json_set_name(a, "body");
         for (int i = 0; i < body.size(); i ++)
             json_push_back(a, vNode(body[i]));
+        json_push_back(v, a);
+    }
+        
+    if (xref.size() == 1)
+    {
+        xref[0]->name = "xref";
+        json_push_back(v, vNode(xref[0]));
+    }
+    else if (xref.size() > 0)
+    {
+        JSONNODE *a = json_new(JSON_ARRAY);
+        json_set_name(a, "xref");
+        for (int i = 0; i < xref.size(); i ++)
+            json_push_back(a, vNode(xref[i]));
         json_push_back(v, a);
     }
     
