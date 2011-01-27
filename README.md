@@ -3,11 +3,11 @@ MediaTags
 
 Author: smaniam@ymail.com
 
-Date: 2011-01-07
+Date: 2011-01-27
 
 Please report issues to the [coolaj86's branch](https://github.com/coolaj86/mtags).
 
-Version 0.32
+Version 0.34
 ====
 
 Warning: This is a work in progress things can change rapidly
