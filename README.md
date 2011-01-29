@@ -24,6 +24,7 @@ Warning: This is a work in progress things can change rapidly
   0. m4atags binary is located in the m4a directory
   0. id3tags binary is located in the id3 directory
   0. imgtags binary is located in the img directory
+  0. pdftags binary is located in the pdf directory
   0. Design philosophy:
     * No modifications to the existing Libraries (they are allowed to evolve)
     * Self contained build - No other external dependencies
@@ -45,8 +46,9 @@ Warning: This is a work in progress things can change rapidly
     * `imgtags [ --with-md5sum ] [ --with-sha1sum ] <imgfile>`
     * `imgtags --help`
   0. pdftags Options supported:
-    * `pdftags --literal <pdffile>`
+    * `pdftags --literal [ --with-md5sum ] [ --with-sha1sum ] <pdffile>`
     * `pdftags --verbose <pdffile>`
+    * `pdftags [ --with-md5sum | --with-sha1sum ] <pdffile>`
     * `pdftags --help`
   0. This release uses the Original AtomicParsley 0.9 and not the bitbucket fork
   0. libexiv2 requires expat (libexpat-dev) for XMP support
