@@ -39,7 +39,6 @@ class PdfTagJson
         void setSHA1(bool mode) { this->sha1 = mode; };
 
     private:
-        //JSONNODE * genLitExif(const Exiv2::ExifData &exif);
         JSONNODE * getChkSum();
         long       getFileSz();
         void       delnewline(char *buf, int len);
