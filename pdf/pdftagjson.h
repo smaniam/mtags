@@ -7,15 +7,6 @@
 
 using std::string;
 
-enum TTYPE {
-    EXIF = 0,
-    XMP,
-    IPTC,
-    JFIF,
-    DATA,
-    TTCNT
-};
-
 class PdfTagJson
 {
     private:
