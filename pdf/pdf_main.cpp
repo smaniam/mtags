@@ -1,7 +1,7 @@
 /*
 ********************************************************************************
 **
-**   IMGTAGS.CPP: Extracts IMG style tags from Image files
+**   PDFTAGS.CPP: Extracts tags from a PDF file
 **                and displays it in JSON format
 **   AUTHOR:      smaniam@ymail.com
 **   LICENSE:     GNU GPL version 3
