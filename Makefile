@@ -7,6 +7,8 @@ EXIV2_HOME   = lib/exiv2
 
 M4A_HOME   = ./m4a
 ID3_HOME   = ./id3
+IMG_HOME   = ./img
+PDF_HOME   = ./pdf
 
 MHASH_CFG_OPTS = --disable-shared --disable-md4 --disable-md2 --disable-tiger --disable-haval  --disable-crc32 --disable-adler32 --disable-ripemd --disable-gost --disable-snefru --disable-whirlpool
 
@@ -63,3 +65,5 @@ cleanall:
 	cd $(M4A_HOME); make clean;
 	cd $(ID3_HOME); make clean;
 	cd $(EXIV2_HOME); make clean;
+	cd $(IMG_HOME); make clean;
+	cd $(PDF_HOME); make clean;
