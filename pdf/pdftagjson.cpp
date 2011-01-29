@@ -342,7 +342,7 @@ static int getsect(const char *fname, VbsData &hdr, VBS &xref, VBS &body)
     {
         int step = 0;
         int i;
-        long pos;
+        long pos = 0;
         
         const char *p;
         try
@@ -446,7 +446,7 @@ static int getsect(const char *fname, VbsData &hdr, VBS &xref, VBS &body)
     // Objects are embedded inbetween
     VbsData *node = new VbsData();
     node->beg = hdr.end + 1;
-    for (int i = 0; i < xref.size(); i++)
+    for (int i = 0; i < (int)xref.size(); i++)
     {
         node->end = xref[i]->beg - 1;
         node->len = node->end - node->beg + 1;
@@ -490,7 +490,7 @@ int PdfTagJson::verbose()
     {
         JSONNODE *a = json_new(JSON_ARRAY);
         json_set_name(a, "body");
-        for (int i = 0; i < body.size(); i ++)
+        for (int i = 0; i < (int)body.size(); i ++)
             json_push_back(a, vNode(body[i]));
         json_push_back(v, a);
     }
@@ -504,7 +504,7 @@ int PdfTagJson::verbose()
     {
         JSONNODE *a = json_new(JSON_ARRAY);
         json_set_name(a, "xref");
-        for (int i = 0; i < xref.size(); i ++)
+        for (int i = 0; i < (int)xref.size(); i ++)
             json_push_back(a, vNode(xref[i]));
         json_push_back(v, a);
     }
@@ -552,7 +552,7 @@ JSONNODE * PdfTagJson::getChkSum()
     std::ifstream f(fname.c_str(), std::ios::in|std::ios::binary);
     if (!f.is_open()) return NULL;
 
-    for (int i = 0; i < body.size(); i++)
+    for (int i = 0; i < (int)body.size(); i++)
     {
         dbeg = body[i]->beg;
         dlen = body[i]->len;
