@@ -171,7 +171,11 @@ int PdfTagJson::literal()
         json_push_back(l, json_new_a("xmp", xmp->getCString()));
     delete doc;
     delete gfname;
-
+    
+    JSONNODE *chksum = getChkSum();
+    if (chksum != NULL)
+        json_push_back(l, chksum);
+    
     cout << json_write_formatted(l) << endl;
     json_delete(l);
 
@@ -192,101 +196,6 @@ int PdfTagJson::checksum()
     return 0;
 }
 
-JSONNODE * PdfTagJson::getChkSum()
-{
-    MHASH           mdd  = NULL;
-    MHASH           shd  = NULL;
-    unsigned char   *md5res;
-    unsigned char   *sha1res;
-    unsigned char   bfr[PDF_B64_BFR_SZ];
-    unsigned char   md5sum[64];
-    unsigned char   sha1sum[64];
-
-    long dbeg, dlen;
-
-    if (!(md5 || sha1)) return NULL;
-
-    if (this->getTagPos() != 0)
-    {
-        cerr << "Invalid File - Only Jpg files with valid data supported\n" << 
-            endl;
-        cout << "{}" << endl;
-        return NULL;
-    }
-
-    // WARNING!!! - Placeholder REPLACE
-    dbeg = 1;  
-    dlen = 100;
-
-    if (dlen == 0) return NULL;
-
-    if (md5)
-    {
-        mdd = mhash_init(MHASH_MD5);
-        if (mdd == MHASH_FAILED) return NULL;
-    }
-
-    if (sha1)
-    {
-        shd = mhash_init(MHASH_SHA1);
-        if (shd == MHASH_FAILED) return NULL;
-    }
-
-    std::ifstream f(fname.c_str(), std::ios::in|std::ios::binary);
-    if (!f.is_open()) return NULL;
-
-    f.seekg(dbeg, std::ios::beg);
-    long   cnt = dlen / PDF_B64_BFR_SZ;
-    long   rmn = dlen % PDF_B64_BFR_SZ;
-
-    while ((f.read((char *)bfr, PDF_B64_BFR_SZ)) && (cnt > 0))
-    {
-        if (md5) mhash(mdd, bfr, PDF_B64_BFR_SZ);
-        if (sha1) mhash(shd, bfr, PDF_B64_BFR_SZ);
-        cnt--;
-    }
-    if (f.read((char *)bfr, rmn))
-    {
-        if (md5) mhash(mdd, bfr, rmn);
-        if (sha1) mhash(shd, bfr, rmn);
-    }
-    f.close();
-
-    JSONNODE  *node = json_new(JSON_NODE);
-    json_set_name(node, "stream");
-
-    if (md5)
-    {
-        md5res = (unsigned char *) mhash_end(mdd);
-        for (int i = 0; i < (int)mhash_get_block_size(MHASH_MD5); i++) 
-        {
-            // printf("%.2x", md5res[i]);
-            sprintf((char *)&md5sum[i<<1], "%.2x", md5res[i]);
-        }
-
-        json_push_back(node, json_new_a("md5sum", (const char*)md5sum));
-    }
-
-    if (sha1)
-    {
-        sha1res = (unsigned char *) mhash_end(shd);
-        for (int i = 0; i < (int)mhash_get_block_size(MHASH_SHA1); i++) 
-        {
-            // printf("%.2x", sha1res[i]);
-            sprintf((char *)&sha1sum[i<<1], "%.2x", sha1res[i]);
-        }
-
-        json_push_back(node, json_new_a("sha1sum", (const char*)sha1sum));
-    }
-
-    if (json_empty(node))
-    {
-        json_delete(node);
-        node = NULL;
-    }
-
-    return node;
-}
 
 // Ripped from poppler:PDFDoc.cc:getXRefStart()
 static Guint getstartxref(PDFDoc *doc, const char *fname)
@@ -603,4 +512,100 @@ int PdfTagJson::verbose()
     cout << json_write_formatted(v) << endl;
     json_delete(v);
     return 0;
+}
+
+JSONNODE * PdfTagJson::getChkSum()
+{
+    MHASH           mdd  = NULL;
+    MHASH           shd  = NULL;
+    unsigned char   *md5res;
+    unsigned char   *sha1res;
+    unsigned char   bfr[PDF_B64_BFR_SZ];
+    unsigned char   md5sum[64];
+    unsigned char   sha1sum[64];
+
+    long dbeg, dlen;
+    VbsData hdr;
+    VBS xref;
+    VBS body;
+    if (getsect(this->fname.c_str(), hdr, xref, body) != 0)
+    {
+        cerr << "Error decoding data\n";
+        return NULL;
+    }
+    
+    if (!(md5 || sha1)) return NULL;
+
+    if (md5)
+    {
+        mdd = mhash_init(MHASH_MD5);
+        if (mdd == MHASH_FAILED) return NULL;
+    }
+
+    if (sha1)
+    {
+        shd = mhash_init(MHASH_SHA1);
+        if (shd == MHASH_FAILED) return NULL;
+    }
+
+    
+    std::ifstream f(fname.c_str(), std::ios::in|std::ios::binary);
+    if (!f.is_open()) return NULL;
+
+    for (int i = 0; i < body.size(); i++)
+    {
+        dbeg = body[i]->beg;
+        dlen = body[i]->len;
+        f.seekg(dbeg, std::ios::beg);
+        long   cnt = dlen / PDF_B64_BFR_SZ;
+        long   rmn = dlen % PDF_B64_BFR_SZ;
+
+        while ((f.read((char *)bfr, PDF_B64_BFR_SZ)) && (cnt > 0))
+        {
+            if (md5) mhash(mdd, bfr, PDF_B64_BFR_SZ);
+            if (sha1) mhash(shd, bfr, PDF_B64_BFR_SZ);
+            cnt--;
+        }
+        if (f.read((char *)bfr, rmn))
+        {
+            if (md5) mhash(mdd, bfr, rmn);
+            if (sha1) mhash(shd, bfr, rmn);
+        }
+    }
+    f.close();
+
+    JSONNODE  *node = json_new(JSON_NODE);
+    json_set_name(node, "stream");
+
+    if (md5)
+    {
+        md5res = (unsigned char *) mhash_end(mdd);
+        for (int i = 0; i < (int)mhash_get_block_size(MHASH_MD5); i++) 
+        {
+            // printf("%.2x", md5res[i]);
+            sprintf((char *)&md5sum[i<<1], "%.2x", md5res[i]);
+        }
+
+        json_push_back(node, json_new_a("md5sum", (const char*)md5sum));
+    }
+
+    if (sha1)
+    {
+        sha1res = (unsigned char *) mhash_end(shd);
+        for (int i = 0; i < (int)mhash_get_block_size(MHASH_SHA1); i++) 
+        {
+            // printf("%.2x", sha1res[i]);
+            sprintf((char *)&sha1sum[i<<1], "%.2x", sha1res[i]);
+        }
+
+        json_push_back(node, json_new_a("sha1sum", (const char*)sha1sum));
+    }
+
+    if (json_empty(node))
+    {
+        json_delete(node);
+        node = NULL;
+    }
+
+    return node;
 }

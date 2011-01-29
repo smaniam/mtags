@@ -86,7 +86,7 @@ main (int argc, char **argv)
         /* getopt_long stores the option index. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "l::o:vhtms",
+        c = getopt_long (argc, argv, ":o:lvhtms",
                long_options, &option_index);
 
         /* Detect the end of the options. */
