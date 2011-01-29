@@ -71,10 +71,9 @@ static JSONNODE * getInfoString(Dict *infoDict, char *key)
   GooString *s1;
   GBool isUnicode;
   Unicode u;
-  char buf[8];
   string str;
 
-  int i, n;
+  int i;
 
   if (infoDict->lookup(key, &obj)->isString()) {
     s1 = obj.getString();
