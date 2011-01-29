@@ -17,7 +17,7 @@ default:
 	@echo "	2. Build Executables: 	make mediatags";
 	@echo;
 
-mediatags: m4atags id3tags imgtags
+mediatags: m4atags id3tags imgtags pdftags
 
 m4atags:
 	cd m4a; make;
@@ -28,7 +28,10 @@ id3tags:
 imgtags:
 	cd img; make;
 
-libs: mhash AtomicParsley libb64 libjson taglib
+pdftags:
+	cd pdf; make;
+
+libs: mhash AtomicParsley libb64 libjson taglib exiv2
 
 libb64:
 	cd $(LIBB64_HOME); make;
