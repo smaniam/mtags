@@ -43,7 +43,6 @@ class PdfTagJson
         JSONNODE * getChkSum();
         long       getFileSz();
         void       delnewline(char *buf, int len);
-        int        getTagPos() { return 0;};
 };
 
 
