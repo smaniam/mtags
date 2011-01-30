@@ -1,7 +1,7 @@
 /*
 ********************************************************************************
 **
-**   IMGTAGS.CPP: Extracts IMG style tags from Image files
+**   PDFTAGS.CPP: Extracts tags from a PDF file
 **                and displays it in JSON format
 **   AUTHOR:      smaniam@ymail.com
 **   LICENSE:     GNU GPL version 3
@@ -86,7 +86,7 @@ main (int argc, char **argv)
         /* getopt_long stores the option index. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "l::o:vhtms",
+        c = getopt_long (argc, argv, ":o:lvhtms",
                long_options, &option_index);
 
         /* Detect the end of the options. */

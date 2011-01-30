@@ -7,6 +7,8 @@ EXIV2_HOME   = lib/exiv2
 
 M4A_HOME   = ./m4a
 ID3_HOME   = ./id3
+IMG_HOME   = ./img
+PDF_HOME   = ./pdf
 
 MHASH_CFG_OPTS = --disable-shared --disable-md4 --disable-md2 --disable-tiger --disable-haval  --disable-crc32 --disable-adler32 --disable-ripemd --disable-gost --disable-snefru --disable-whirlpool
 
@@ -17,7 +19,7 @@ default:
 	@echo "	2. Build Executables: 	make mediatags";
 	@echo;
 
-mediatags: m4atags id3tags imgtags
+mediatags: m4atags id3tags imgtags pdftags
 
 m4atags:
 	cd m4a; make;
@@ -28,7 +30,10 @@ id3tags:
 imgtags:
 	cd img; make;
 
-libs: mhash AtomicParsley libb64 libjson taglib
+pdftags:
+	cd pdf; make;
+
+libs: mhash AtomicParsley libb64 libjson taglib exiv2
 
 libb64:
 	cd $(LIBB64_HOME); make;
@@ -60,3 +65,5 @@ cleanall:
 	cd $(M4A_HOME); make clean;
 	cd $(ID3_HOME); make clean;
 	cd $(EXIV2_HOME); make clean;
+	cd $(IMG_HOME); make clean;
+	cd $(PDF_HOME); make clean;

@@ -7,15 +7,6 @@
 
 using std::string;
 
-enum TTYPE {
-    EXIF = 0,
-    XMP,
-    IPTC,
-    JFIF,
-    DATA,
-    TTCNT
-};
-
 class PdfTagJson
 {
     private:
@@ -39,11 +30,9 @@ class PdfTagJson
         void setSHA1(bool mode) { this->sha1 = mode; };
 
     private:
-        //JSONNODE * genLitExif(const Exiv2::ExifData &exif);
         JSONNODE * getChkSum();
         long       getFileSz();
         void       delnewline(char *buf, int len);
-        int        getTagPos() { return 0;};
 };
 
 
