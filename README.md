@@ -10,19 +10,20 @@ MediaTags
 
 Author: smaniam@ymail.com
 
-Date: 2011-01-07
+Date: 2011-01-27
 
 Please report issues to the [coolaj86's branch](https://github.com/coolaj86/mtags).
 
-Version 0.32
+Version 0.34
 ====
 
 Warning: This is a work in progress things can change rapidly
 
-  0. Current support is for m4atags, id3tags and imgtags only
+  0. Current support is for m4atags, id3tagsi, imgtags and pdftags
   0. m4atags is dependent on AtomicParsley and mhash (both are bundled)
   0. id3tags is dependent on TagLib and libjson (both are bundled)
   0. imgtags is dependent on libexiv2 and libjson (both are bundled)
+  0. pdftags is dependent on libpoppler - This is not bundled in this release
   0. Building m4atags, id3tags and imgtags for the very first time:
     * Type: make libs
     * Type: make mediatags
@@ -30,6 +31,7 @@ Warning: This is a work in progress things can change rapidly
   0. m4atags binary is located in the m4a directory
   0. id3tags binary is located in the id3 directory
   0. imgtags binary is located in the img directory
+  0. pdftags binary is located in the pdf directory
   0. Design philosophy:
     * No modifications to the existing Libraries (they are allowed to evolve)
     * Self contained build - No other external dependencies
@@ -49,6 +51,12 @@ Warning: This is a work in progress things can change rapidly
     * `imgtags --literal=[e|i|x] [ --with-md5sum ] [ --with-sha1sum ] <imgfile>`
     * `imgtags --verbose <imgfile>`
     * `imgtags [ --with-md5sum ] [ --with-sha1sum ] <imgfile>`
+    * `imgtags --help`
+  0. pdftags Options supported:
+    * `pdftags --literal [ --with-md5sum ] [ --with-sha1sum ] <pdffile>`
+    * `pdftags --verbose <pdffile>`
+    * `pdftags [ --with-md5sum | --with-sha1sum ] <pdffile>`
+    * `pdftags --help`
   0. This release uses the Original AtomicParsley 0.9 and not the bitbucket fork
   0. libexiv2 requires expat (libexpat-dev) for XMP support
   0. imgtags supports verbose and checksum mode for JPG files only
@@ -56,6 +64,8 @@ Warning: This is a work in progress things can change rapidly
     * Compiling atomicparsley generates a lot of Warning messages (Ignore)
     * This was tested with a limited number of files (fetched from internet), 
     any help in obtaining some non-contraband stuff would be more than welcome
+  0. Dependencies:
+    * Compiling pdftags requires libpoppler (libpoppler-dev package)
 
 Project Goals
 ====
