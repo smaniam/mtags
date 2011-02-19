@@ -1,12 +1,7 @@
-EXIV2_HOME = ../lib/exiv2
-MHASH_HOME = ../lib/mhash
-LIBB64_HOME = ../lib/libb64
-LIBJSON_HOME = ../lib/libjson
-JHEAD_HOME = ../lib/jhead
+LIBB64_HOME = ../deps/libb64-1.2
 
-EXIV2_INC = -I$(EXIV2_HOME)/src
-INC = $(EXIV2_INC) -I$(MHASH_HOME)/include -I$(LIBB64_HOME)/include -I$(LIBJSON_HOME) -I$(JHEAD_HOME)
-LIBPATH = -L$(MHASH_HOME)/lib/.libs -L$(LIBB64_HOME)/src -L$(EXIV2_HOME)/src/.libs -L$(LIBJSON_HOME)
+INC = -I../include -I$(LIBB64_HOME)/include
+LIBPATH = -L$(LIBB64_HOME)/src
 ##LIBS = -lmhash -lb64 -ltag -lz -ljson
 LIBS = -lexiv2 -lz -lexpat -ljson -lmhash
 
