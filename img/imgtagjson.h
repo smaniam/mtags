@@ -3,8 +3,8 @@
 
 #include <string>
 #include "img_jdefs.h"
-#include "exiv2.hpp"
-#include "libjson.h"
+#include "exiv2/exiv2.hpp"
+#include "libjson/libjson.h"
 
 using std::string;
 

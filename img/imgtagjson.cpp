@@ -9,7 +9,7 @@
 #include <mhash.h>
 #define BUFFERSIZE (IMG_B64_BFR_SZ * 2)
 #include <b64/encode.h>
-#include "exiv2.hpp"
+#include "exiv2/exiv2.hpp"
 extern "C" {
 #include "jhead.h"
 }
