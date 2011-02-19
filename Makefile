@@ -22,10 +22,10 @@ default:
 mediatags: m4atags id3tags imgtags pdftags
 
 m4atags:
-	cd m4a; make;
+	make -C m4a;
 
 id3tags:
-	cd id3; make;
+	make -C id3;
 
 imgtags:
 	cd img; make;
@@ -67,3 +67,9 @@ cleanall:
 	cd $(EXIV2_HOME); make clean;
 	cd $(IMG_HOME); make clean;
 	cd $(PDF_HOME); make clean;
+
+release:
+	cp m4a/m4atags linux-x86-bins/
+	cp id3/id3tags linux-x86-bins/
+	cp img/imgtags linux-x86-bins/
+	cp pdf/pdftags linux-x86-bins/

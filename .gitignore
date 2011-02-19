@@ -1,8 +1,11 @@
 *.o
+*.a
+*.Tpo
 *.lo
 *.la
 *.Po
 *.Plo
+*.log
 .deps
 obj_files
 .libs
