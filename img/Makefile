@@ -1,6 +1,6 @@
 LIBB64_HOME = ../deps/libb64-1.2
 
-INC = -I../include -I$(LIBB64_HOME)/include
+INC = -I$(LIBB64_HOME)/include
 LIBPATH = -L$(LIBB64_HOME)/src
 ##LIBS = -lmhash -lb64 -ltag -lz -ljson
 LIBS = -lexiv2 -lz -lexpat -ljson -lmhash

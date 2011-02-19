@@ -5,6 +5,28 @@ CURDIR=`pwd`
 mkdir -p deps
 cd deps
 
+
+
+#
+# jhead
+#
+function build_jhead {
+  if [ ! -f "jhead-2.90.tar.gz" ]
+  then
+    wget http://www.sentex.net/~mwandel/jhead/jhead-2.90.tar.gz
+  fi
+  if [ ! -d "jhead-2.90" ]
+  then
+    tar xf jhead-2.90.tar.gz
+  fi
+  cd jhead-2.90
+    make
+    sudo make install
+  cd -
+}
+
+
+
 #
 # TagLib
 #
@@ -14,11 +36,13 @@ function build_taglib {
   svn up -r 1221631 
   mkdir -p taglib/build
   cd taglib/build
-  cmake ..
-  make
-  sudo make install
+    cmake ..
+    make
+    sudo make install
   cd -
 }
+
+
 
 #
 # AtomicParsley
@@ -29,25 +53,28 @@ function build_atomicparsley_hg {
   
   hg clone https://bitbucket.org/wez/atomicparsley
   cd atomicparsley
-  ./autogen.sh
-  ./configure
-  make
-  sudo make install
+    ./autogen.sh
+    ./configure
+    make
+    sudo make install
+  cd -
 }
 function build_atomicparsley_svn {
   # SVN version is broken in later versions
   svn co -r 91 https://atomicparsley.svn.sourceforge.net/svnroot/atomicparsley/trunk/atomicparsley atomicparsley
   cd atomicparsley
   rm -rf ./*
-  svn up -r 91
-  patch -p1 < ../../atomicparsley.patch
-  ./build
-  # uses autoconf in later versions
-  #autoconf && autoheader
-  #./configure
-  #make
+    svn up -r 91
+    patch -p1 < ../../atomicparsley.patch
+    ./build
+    # uses autoconf in later versions
+    #autoconf && autoheader
+    #./configure
+    #make
   cd -
 }
+
+
 
 #
 # mhash
@@ -70,6 +97,8 @@ function build_mhash {
   cd -
 }
 
+
+
 #
 # libb64
 #
@@ -86,6 +115,8 @@ function build_libb64 {
     make
   cd -
 }
+
+
 
 #
 # libjson
@@ -107,6 +138,8 @@ function build_libjson {
   cd -
 }
 
+
+
 #
 # exiv2
 #
@@ -121,10 +154,52 @@ function build_exiv2 {
   cd -
 }
 
-#build_taglib
-#build_atomicparsley_svn
+
+
+#
+# fontconfig
+#
+function build_fontconfig {
+  git clone git://anongit.freedesktop.org/fontconfig
+  git checkout 2.8.0
+  cd fontconfig
+    ./autogen.sh
+    make
+    sudo make install
+  cd -
+}
+
+
+
+#
+# poppler
+#
+function build_poppler {
+  # TODO use the git repo instead
+  # git clone git://git.freedesktop.org/git/poppler/poppler
+  if [ ! -f "poppler-0.16.2.tar.gz" ]
+  then
+    wget http://poppler.freedesktop.org/poppler-0.16.2.tar.gz
+  fi
+  if [ ! -d "poppler-0.16.2" ]
+  then
+    tar xf poppler-0.16.2.tar.gz
+  fi
+  mkdir -p poppler-0.16.2/build
+  cd poppler-0.16.2/build
+    cmake ..
+    make
+    sudo make install
+  cd -
+}
+
+#build_jhead
+build_taglib
+build_atomicparsley_svn
 #build_atomicparsley_hg
-#build_mhash
-#build_libb64
-#build_libjson
+build_mhash
+build_libb64
+build_libjson
 build_exiv2
+build_fontconfig
+build_poppler
