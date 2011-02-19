@@ -1,3 +1,0 @@
-mp4coverart.lo: mp4coverart.cpp ../../config.h
-
-../../config.h:

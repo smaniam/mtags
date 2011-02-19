@@ -1,3 +1,0 @@
-mp4atom.lo: mp4atom.cpp ../../config.h
-
-../../config.h:

@@ -1,3 +1,0 @@
-asftag.lo: asftag.cpp ../../config.h
-
-../../config.h:

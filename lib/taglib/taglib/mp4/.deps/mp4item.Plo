@@ -1,3 +1,0 @@
-mp4item.lo: mp4item.cpp ../../config.h
-
-../../config.h:

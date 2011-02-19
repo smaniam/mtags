@@ -1,3 +1,0 @@
-asfattribute.lo: asfattribute.cpp ../../config.h
-
-../../config.h:

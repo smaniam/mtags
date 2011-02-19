@@ -1,3 +1,0 @@
-asfproperties.lo: asfproperties.cpp ../../config.h
-
-../../config.h:
