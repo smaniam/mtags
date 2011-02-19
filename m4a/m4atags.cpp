@@ -22,13 +22,32 @@ extern "C"
 #include "b64/cencode.h"
 }
 
+#include <stdint.h>
 
+/*
+// For the current https://bitbucket.org/wez/atomicparsley/overview
+#include "AtomDefs.h"
+*/
+/*
+// These are probably not needed
+#include "ap_types.h"
+#include "AtomicParsley.h"
+#include "CDtoc.h"
+#include "config.h"
+#include "id3v2defs.h"
+#include "id3v2.h"
+#include "id3v2types.h"
+#include "util.h"
+*/
+
+// For the old AP
 #include "AP_commons.h"
 #include "AtomicParsley.h"
 #include "AP_AtomExtracts.h"
 #include "AP_iconv.h"          
 #include "AtomicParsley_genres.h"  
 #include "APar_uuid.h"
+
 
 #include "m4a_json.h"
 

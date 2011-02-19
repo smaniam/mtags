@@ -1,11 +1,12 @@
-APAR_HOME = ../lib/AtomicParsley
+APAR_HOME = ../deps/atomicparsley
 APAR_OBJ_PATH = $(APAR_HOME)/obj_files
+#APAR_HOME = ../deps/atomicparsley/src
+#APAR_OBJ_PATH = $(APAR_HOME)
 
-MHASH_HOME = ../lib/mhash
-LIBB64_HOME = ../lib/libb64
+LIBB64_HOME = ../deps/libb64-1.2
 
-INC = -I$(APAR_HOME) -I$(MHASH_HOME)/include -I$(LIBB64_HOME)/include
-LIBPATH = -L$(MHASH_HOME)/lib/.libs -L$(LIBB64_HOME)/src
+INC = -I$(APAR_HOME) -I$(LIBB64_HOME)/include
+LIBPATH = -L$(LIBB64_HOME)/src
 LIBS = -lmhash -lb64
 
 CC = g++
@@ -14,6 +15,7 @@ OBJ = $(APAR_OBJ_PATH)/APar_sha1.o $(APAR_OBJ_PATH)/APar_uuid.o $(APAR_OBJ_PATH)
 
 m4atags: m4atags.o $(APAR_OBJ_PATH)/main.o m4a_json.o
 	$(CC) -g -O2 -Wall -o $@ m4atags.o m4a_json.o $(OBJ) $(LIBPATH) $(LIBS)
+	mv m4atags ../
 
 m4a_json.o: m4a_json.cpp
 	$(CC) -g -O2 -Wall $(INC) -MT $@ -MD -MP -MF "./m4a_json.Tpo" -c -o $@ $<
