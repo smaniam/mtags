@@ -3,13 +3,13 @@
 #include <string.h>
 #include <vector>
 
-#include <tbytevector.h>
-#include <tstringlist.h>
-#include <mpegfile.h>
-#include <id3v2tag.h>
-#include <id3v1tag.h>
-#include <id3v2extendedheader.h>
-#include <frames/attachedpictureframe.h>
+#include <taglib/tbytevector.h>
+#include <taglib/tstringlist.h>
+#include <taglib/mpegfile.h>
+#include <taglib/id3v2tag.h>
+#include <taglib/id3v1tag.h>
+#include <taglib/id3v2extendedheader.h>
+#include <taglib/attachedpictureframe.h>
 
 #include "id3tagjson.h"
 #include "id3stringdefs.h"

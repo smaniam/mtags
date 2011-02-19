@@ -1,11 +1,7 @@
-TGL_HOME = ../lib/taglib
-MHASH_HOME = ../lib/mhash
-LIBB64_HOME = ../lib/libb64
-LIBJSON_HOME = ../lib/libjson
+LIBB64_HOME = ../deps/libb64-1.2
 
-TGL_INC = -I$(TGL_HOME)/taglib/  -I$(TGL_HOME)/taglib/toolkit -I$(TGL_HOME)/taglib/mpeg -I$(TGL_HOME)/taglib/mpeg/id3v2 -I$(TGL_HOME)/taglib/mpeg/id3v1 -I$(TGL_HOME)/taglib/ape
-INC = $(TGL_INC) -I$(MHASH_HOME)/include -I$(LIBB64_HOME)/include -I$(LIBJSON_HOME)
-LIBPATH = -L$(MHASH_HOME)/lib/.libs -L$(LIBB64_HOME)/src -L$(TGL_HOME)/taglib/.libs -L$(LIBJSON_HOME)
+INC = -I$(LIBB64_HOME)/include 
+LIBPATH = -L$(LIBB64_HOME)/src -L$(TGL_HOME)/taglib/.libs
 LIBS = -lmhash -lb64 -ltag -lz -ljson
 
 CC = g++
@@ -15,6 +11,7 @@ OBJ = id3_main.o id3tagjson.o
 
 id3tags: $(OBJ)
 	$(CC) -g $(CFLAGS) -o $@ $^ $(LIBPATH) $(LIBS)
+	mv id3tags ../
 
 id3_main.o: id3_main.cpp
 	$(CC) -g $(INC) $(CFLAGS) -MT $@ -MD -MP -MF ".deps/id3_main.Tpo" -c -o $@ $<

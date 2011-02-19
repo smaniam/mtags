@@ -2,10 +2,10 @@
 #define __ID3_TAG_JSON_H__
 
 #include <string>
-#include <mpegfile.h>
-#include <id3v2tag.h>
+#include <taglib/mpegfile.h>
+#include <taglib/id3v2tag.h>
 #include "id3_jdefs.h"
-#include "libjson.h"
+#include "libjson/libjson.h"
 
 using std::string;
 
