@@ -12,6 +12,7 @@ OBJ = img_main.o imgtagjson.o
 
 imgtags: $(OBJ)
 	$(CC) -g $(CFLAGS) -o $@ $^ $(LIBPATH) $(LIBS)
+	mv imgtags ../
 
 img_main.o: img_main.cpp imgtagjson.h
 	$(CC) -g $(INC) $(CFLAGS) -MT $@ -MD -MP -MF ".deps/img_main.Tpo" -c -o $@ $<

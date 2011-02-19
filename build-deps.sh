@@ -2,6 +2,7 @@
 
 CURDIR=`pwd`
 
+mkdir -p deps
 cd deps
 
 #
@@ -47,23 +48,83 @@ function build_atomicparsley_svn {
   #make
   cd -
 }
-function build_atomicparsley_zip {
-  if [ ! -f "AtomicParsley-source-0.9.0.zip" ]
+
+#
+# mhash
+#
+function build_mhash {
+  if [ ! -f "mhash-0.9.9.9.tar.bz2" ]
   then
-    wget http://downloads.sourceforge.net/project/atomicparsley/atomicparsley/AtomicParsley%20v0.9.0/AtomicParsley-source-0.9.0.zip
+    wget http://downloads.sourceforge.net/project/mhash/mhash/0.9.9.9/mhash-0.9.9.9.tar.bz2
   fi
-  if [ -d "AtomicParsley-source-0.9.0" ]
+  if [ ! -d "mhash-0.9.9.9" ]
   then
-    rm -rf AtomicParsley-source-0.9.0
+    tar xf mhash-0.9.9.9.tar.bz2
+    cd mhash-0.9.9.9
+    ./configure >/dev/null
+  else
+    cd mhash-0.9.9.9
   fi
-  rm -rf __MACOSX
-  unzip AtomicParsley-source-0.9.0.zip
-  rm -rf __MACOSX
-  cd AtomicParsley-source-0.9.0
-  patch -p1 < ../../atomicparsley.patch
-  ./build
+  make >/dev/null
+  sudo make install
+  cd -
+}
+
+#
+# libb64
+#
+function build_libb64 {
+  if [ ! -f "libb64-1.2.src.zip" ]
+  then
+    wget http://downloads.sourceforge.net/project/libb64/libb64/libb64/libb64-1.2.src.zip
+  fi
+  if [ ! -d "libb64-1.2" ]
+  then
+    unzip libb64-1.2.src.zip
+  fi
+  cd libb64-1.2/src
+    make
+  cd -
+}
+
+#
+# libjson
+#
+function build_libjson {
+  if [ ! -f "libjson_7.0.1.zip" ]
+  then
+    wget http://downloads.sourceforge.net/project/libjson/libjson_7.0.1.zip
+  fi
+  if [ ! -d "libjson_7.0.1" ]
+  then
+    unzip libjson_7.0.1.zip
+    # fix permissions error
+    chmod a+rx Source/JSONDefs
+  fi
+  cd libjson
+    make
+    sudo make install
+  cd -
+}
+
+#
+# exiv2
+#
+function build_exiv2 {
+  svn checkout -r 2426 svn://dev.exiv2.org/svn/trunk exiv2
+  svn up -r 2426
+  mkdir -p exiv2/build
+  cd exiv2/build
+    cmake ..
+    make
+    sudo make install
   cd -
 }
 
 #build_taglib
-build_atomicparsley_svn
+#build_atomicparsley_svn
+#build_atomicparsley_hg
+#build_mhash
+#build_libb64
+#build_libjson
+build_exiv2

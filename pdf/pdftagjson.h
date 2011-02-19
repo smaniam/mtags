@@ -3,7 +3,7 @@
 
 #include <string>
 #include "pdf_jdefs.h"
-#include "libjson.h"
+#include "libjson/libjson.h"
 
 using std::string;
 

@@ -1,11 +1,7 @@
-POPP_HOME = /usr/include
-MHASH_HOME = ../lib/mhash
-LIBB64_HOME = ../lib/libb64
-LIBJSON_HOME = ../lib/libjson
+LIBB64_HOME = ../deps/libb64-1.2
 
-POPP_INC = -I$(POPP_HOME)/poppler
-INC = $(POPP_INC) -I$(MHASH_HOME)/include -I$(LIBB64_HOME)/include -I$(LIBJSON_HOME) -I$(JHEAD_HOME)
-LIBPATH = -L$(MHASH_HOME)/lib/.libs -L$(LIBB64_HOME)/src -L$(EXIV2_HOME)/src/.libs -L$(LIBJSON_HOME)
+INC = -I$(LIBB64_HOME)/include
+LIBPATH = -L$(LIBB64_HOME)/src
 ##LIBS = -lmhash -lb64 -ltag -lz -ljson
 LIBS = -lpoppler -ljson -lmhash
 
@@ -16,6 +12,7 @@ OBJ = pdf_main.o pdftagjson.o
 
 pdftags: $(OBJ)
 	$(CC) -g $(CFLAGS) -o $@ $^ $(LIBPATH) $(LIBS)
+	mv pdftags ../
 
 pdf_main.o: pdf_main.cpp pdftagjson.h
 	$(CC) -g $(INC) $(CFLAGS) -MT $@ -MD -MP -MF ".deps/pdf_main.Tpo" -c -o $@ $<
