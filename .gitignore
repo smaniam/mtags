@@ -1,3 +1,5 @@
+deps
+build
 *.o
 *.a
 *.Tpo

@@ -88,7 +88,7 @@ function build_mhash {
   then
     tar xf mhash-0.9.9.9.tar.bz2
     cd mhash-0.9.9.9
-    ./configure >/dev/null
+    ./configure --disable-shared --disable-md4 --disable-md2 --disable-tiger --disable-haval  --disable-crc32 --disable-adler32 --disable-ripemd --disable-gost --disable-snefru --disable-whirlpool >/dev/null
   else
     cd mhash-0.9.9.9
   fi
