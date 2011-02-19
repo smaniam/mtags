@@ -1,0 +1,58 @@
+diff -rupN ../deps/AtomicParsley-source-0.9.0/AtomicParsley.cpp AtomicParsley/AtomicParsley.cpp
+--- ../deps/AtomicParsley-source-0.9.0/AtomicParsley.cpp	2006-09-15 17:22:33.000000000 -0600
++++ AtomicParsley/AtomicParsley.cpp	2011-02-19 08:53:31.000000000 -0700
+@@ -1447,7 +1447,7 @@ void APar_Extract_uuid_binary_file(Atomi
+ 	uint32_t atom_offsets = 0;
+ 	char* uuid_outfile = (char*)calloc(1, sizeof(char)*MAXPATHLEN+1); //malloc a new string because it may be a cli arg for a specific output path	
+ 	if (output_path == NULL) {
+-		char* orig_suffix = strrchr(originating_file, '.');
++		char* orig_suffix = (char *)strrchr(originating_file, '.');
+ 		if (orig_suffix == NULL) {
+ 			fprintf(stdout, "AP warning: a file extension for the input file was not found.\n\tGlobbing onto original filename...\n");
+ 			path_len = strlen(originating_file);
+@@ -4464,7 +4464,7 @@ void APar_TestTracksForKind() {
+ void APar_DeriveNewPath(const char *filePath, char* temp_path, int output_type, const char* file_kind, char* forced_suffix, bool random_filename = true) {
+ 	char* suffix = NULL;
+ 	if (forced_suffix == NULL) {
+-		suffix = strrchr(filePath, '.');
++		suffix = (char *)strrchr(filePath, '.');
+ 	} else {
+ 		suffix = forced_suffix;
+ 	}
+@@ -4480,7 +4480,7 @@ void APar_DeriveNewPath(const char *file
+ 		memcpy(temp_path, filePath, base_len);
+ 		memcpy(temp_path + base_len, file_kind, strlen(file_kind));
+ #else
+-		char* file_name = strrchr(filePath, '/');
++		char* file_name = (char *)strrchr(filePath, '/');
+ 		size_t file_name_len = strlen(file_name);
+ 		memcpy(temp_path, filePath, filepath_len-file_name_len+1);
+ 		memcpy(temp_path + strlen(temp_path), ".", 1);
+@@ -5006,7 +5006,7 @@ void APar_WriteFile(const char* m4aFile,
+ 			free_modified_name = true;
+ 			if (forced_suffix_type == FORCE_M4B_TYPE) { //using --stik Audiobook with --overWrite will change the original file's extension
+ 				uint16_t filename_len = strlen(m4aFile);
+-				char* suffix = strrchr(m4aFile, '.');
++				char* suffix = (char *)strrchr(m4aFile, '.');
+ 				memcpy(originating_file, m4aFile, filename_len+1 );
+ 				memcpy(originating_file + (filename_len - strlen(suffix) ), ".m4b", 5 );
+ 			}
+diff -rupN ../deps/AtomicParsley-source-0.9.0/Makefile AtomicParsley/Makefile
+--- ../deps/AtomicParsley-source-0.9.0/Makefile	1969-12-31 17:00:00.000000000 -0700
++++ AtomicParsley/Makefile	2011-02-19 08:53:31.000000000 -0700
+@@ -0,0 +1,15 @@
++CC = g++
++
++OBJ = obj_files/APar_sha1.o obj_files/APar_uuid.o obj_files/AP_commons.o obj_files/AtomicParsley_genres.o obj_files/AP_iconv.o obj_files/AP_AtomExtracts.o obj_files/AtomicParsley.o
++
++m4atags: obj_files/m4atags.o obj_files/json_dump.o obj_files/main.o obj_files/m4a_json.o
++	$(CC) -g -o $@ obj_files/m4atags.o obj_files/json_dump.o obj_files/m4a_json.o $(OBJ)
++
++obj_files/json_dump.o: json_dump.cpp
++	$(CC) -g -O2 -Wall -I../AtomicParsley -MT $@ -MD -MP -MF "./obj_files/json_dump.Tpo" -c -o $@ $<
++
++obj_files/m4a_json.o: m4a_json.cpp
++	$(CC) -g -O2 -Wall -I../AtomicParsley -MT $@ -MD -MP -MF "./obj_files/m4a_json.Tpo" -c -o $@ $<
++
++obj_files/m4atags.o: m4atags.cpp
++	$(CC) -g -O2 -Wall -I../AtomicParsley -MT $@ -MD -MP -MF "./obj_files/m4atags.Tpo" -c -o $@ $<

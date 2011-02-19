@@ -45,7 +45,7 @@ AtomicParsley:
 	cd $(APAR_HOME); ./build;
 
 taglib:
-	cd $(TAGLIB_HOME); ./configure --disable-debug --disable-shared --enable-static; make
+	echo "sudo apt-get install libtag1-vanilla libtag1-dev"
 
 libjson:
 	cd $(LIBJSON_HOME); make;
@@ -68,8 +68,11 @@ cleanall:
 	cd $(IMG_HOME); make clean;
 	cd $(PDF_HOME); make clean;
 
-release:
-	cp m4a/m4atags linux-x86-bins/
-	cp id3/id3tags linux-x86-bins/
-	cp img/imgtags linux-x86-bins/
-	cp pdf/pdftags linux-x86-bins/
+release: mediatags
+	mv m4atags linux-x86-bins/
+	mv id3tags linux-x86-bins/
+	mv imgtags linux-x86-bins/
+	mv pdftags linux-x86-bins/
+
+install: release
+	sudo cp -a linux-x86-bins/* /usr/bin/
