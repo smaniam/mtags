@@ -35,7 +35,7 @@ clean_deps:
 	rm deps -rf
 
 clean:
-	rm -rf imgtags pdftags m4atags mp3tags
+	rm -rf imgtags pdftags m4atags id3tags
 	make clean -C $(M4A_HOME)
 	make clean -C $(ID3_HOME)
 	make clean -C $(IMG_HOME)
