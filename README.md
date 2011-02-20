@@ -22,6 +22,31 @@ Instalation
     make deps
     make mediatags
 
+dependencies
+---
+
+The following dependencies will be built (because the ones your package manager provides may or may not be suitable)
+
+  * libjson
+  * libb64
+  * mhash
+  * AtomicParsley
+  * taglib
+  * exiv2
+  * fontconfig
+  * poppler
+
+You may need to install build system tools as follows
+
+    sudo apt-get install \
+      build-essential \
+      subversion \
+      mercurial \
+      git-core \
+      cmake \
+      libfreetype6 \
+      libfreetype6-dev \
+      libtool
 
 Usage
 ====
