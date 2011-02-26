@@ -59,6 +59,24 @@ function build_atomicparsley_hg {
     sudo make install
   cd -
 }
+function build_atomicparsley_hg_tar {
+  APHGVER="3b67584ebdb2"
+  APHGPKG="wez-atomicparsley"
+  if [ ! -f "atomicparsley-${APHGVER}.tar.gz" ]
+  then
+    curl https://bitbucket.org/wez/atomicparsley/get/${APHGVER}.tar.gz -o ${APHGPKG}-${APHGVER}.tar.gz
+  fi
+  if [ ! -d "${APHGPKG}-${APHGVER}" ]
+  then
+    tar xf ${APHGPKG}-${APHGVER}.tar.gz
+  fi
+  cd ${APHGPKG}-${APHGVER}
+    ./autogen.sh
+    ./configure
+    make
+    sudo make install
+  cd -
+}
 function build_atomicparsley_svn {
   # SVN version is broken in later versions
   svn co -r 91 https://atomicparsley.svn.sourceforge.net/svnroot/atomicparsley/trunk/atomicparsley atomicparsley
@@ -215,6 +233,7 @@ function build_poppler_data {
 build_taglib
 build_atomicparsley_svn
 #build_atomicparsley_hg
+#build_atomicparsley_hg_tar
 build_mhash
 build_libb64
 build_libjson
