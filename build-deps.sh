@@ -193,6 +193,24 @@ function build_poppler {
   cd -
 }
 
+function build_poppler_data {
+  LPDVER="0.4.4"
+  if [ ! -f "poppler-data-${LPDVER}.tar.gz" ]
+  then
+    wget http://poppler.freedesktop.org/poppler-data-${LPDVER}.tar.gz
+  fi
+  if [ ! -d "poppler-data-${LPDVER}" ]
+  then
+    tar xf poppler-data-${LPDVER}.tar.gz
+  fi
+  mkdir -p poppler-data-${LPDVER}/build
+  cd poppler-data-${LPDVER}/build
+    cmake ..
+    make
+    sudo make install
+  cd -
+}
+
 #build_jhead
 build_taglib
 build_atomicparsley_svn
@@ -203,3 +221,4 @@ build_libjson
 build_exiv2
 build_fontconfig
 build_poppler
+build_poppler_data
