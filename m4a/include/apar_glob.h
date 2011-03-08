@@ -13,6 +13,7 @@
 
 #include "AtomicParsley.h"
 //#include "AP_AtomDefinitions.h"
+/*
 #include "AP_iconv.h"
 #include "AtomicParsley_genres.h"
 #include "APar_uuid.h"
@@ -21,19 +22,21 @@
 #include "AP_NSImage.h"
 #include "AP_NSFile_utils.h"
 #endif
+*/
 
 
 ////////////////////////////////////////////////////////////////////////////////
 //                        Global Variables                                    //
 ////////////////////////////////////////////////////////////////////////////////
 
+/***
 extern bool modified_atoms;
 extern bool alter_original;
 
 extern bool svn_build;
 
 extern FILE* source_file;
-extern uint32_t file_size;
+//extern uint32_t file_size;
 
 extern struct AtomicInfo parsedAtoms[MAX_ATOMS]; //(most I've seen is 144 for an untagged mp4)
 extern short atom_number;
@@ -60,9 +63,9 @@ extern uint64_t mdat_supplemental_offset;
 extern uint32_t removed_bytes_tally;
 extern uint32_t new_file_size;
 extern uint32_t brand;
-extern uint32_t mdatData;
+//extern uint32_t mdatData;
 
-extern uint32_t gapless_void_padding;
+//extern uint32_t gapless_void_padding;
 
 extern struct udta_stats udta_dynamics;
 extern struct padding_preferences pad_prefs;
@@ -97,5 +100,6 @@ extern void json_ExtractDataAtom(int this_atom_number);
 
 extern uint32_t APar_DetermineMediaData_AtomPosition();
 extern void APar_SimpleAtomPrintout();
+**/
 
 #endif
