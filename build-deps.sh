@@ -232,9 +232,9 @@ function build_poppler_data {
 
 #build_jhead
 build_taglib
-build_atomicparsley_svn
+#build_atomicparsley_svn
 #build_atomicparsley_hg
-#build_atomicparsley_hg_tar
+build_atomicparsley_hg_tar
 build_mhash
 build_libb64
 build_libjson
