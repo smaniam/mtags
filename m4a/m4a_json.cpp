@@ -11,6 +11,7 @@ extern "C"
 }
 
 const char *TABSPACE = "    ";
+const char AUGIDENT[] = { 0xef, 0xbb, 0xbf, 'A', 't', 'o', 'm', '\0' };
 
 int m4a_display_json_tree(
     FILE *in,
@@ -39,7 +40,8 @@ int m4a_display_json_tree(
         //printf("%s", line);
 
         tok = strtok(line, " ");
-        if ((tok != NULL) && (strcmp(tok, "Atom") != 0)) continue;
+        if ((tok != NULL) && !((strcmp(tok, "Atom") == 0) ||
+            (strcmp(tok, AUGIDENT) == 0))) continue;
 
         i = 0;
         while (tok != NULL)
@@ -216,7 +218,8 @@ int m4a_display_json_tags(
         if (tok == NULL) continue;
 
         // Overflowing Value has \n in it
-        if ((tok != NULL) && (strcmp(tok, "Atom") != 0)) 
+        if ((tok != NULL) && !((strcmp(tok, "Atom") == 0) ||
+            (strcmp(tok, AUGIDENT) == 0)))
         {
             line[strlen(line)] = ' ';
             m4a_stuff_backslash(line, sanitised);
