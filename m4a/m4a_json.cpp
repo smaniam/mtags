@@ -204,11 +204,11 @@ int m4a_display_json_tags(
     while ((lnsz = getline(&line, &len, in)) != -1) 
     {
         char *tok;
-        char *ptree[64];
+        char *ptree[512];
         int i, j;
-        char atom[128];
-        char value[256];
-        char sanitised[256];
+        char atom[512];
+        char value[5120];
+        char sanitised[5120];
 
         line[lnsz-1] = '\0';
 
