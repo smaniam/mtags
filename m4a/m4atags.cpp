@@ -201,7 +201,9 @@ inline int get_chksum(M4A_TAG_CFG *cfg, char *m4afile,
     {
          if (m4a_stream_chksum(m4afile, *md5sum, *sha1sum) != 0)
          {
-             fprintf(stderr, "Checksum failure exiting\n");
+             fprintf(stderr, "Checksum failure no mdat or unable to open file\n");
+             if (*md5sum != NULL)  *md5sum[0] = '\0';
+             if (*sha1sum != NULL) *sha1sum[0] = '\0';
              return 10;
          }
          return 0;
